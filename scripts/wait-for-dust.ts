@@ -1,22 +1,13 @@
-// This file is part of example-hello-world.
-// Copyright (C) Midnight Foundation
-// SPDX-License-Identifier: Apache-2.0
-// Licensed under the Apache License, Version 2.0 (the "License");
-// You may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// https://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-// Block until Alice has ≥1 spendable DUST coin. syncWallet's
-// progress.isStrictlyComplete() means "synced to chain tip", not "wallet has
-// funds" — on a fresh devnet it returns at block 0/1 with zero coins, so
-// the first tx fails with Wallet.InsufficientFunds. This script improves the CI workflow.
+/**
+ * Midnight Shield Wallet - DUST Token Balance Synchronizer
+ * 
+ * Synchronizes wallet state with the Midnight chain tip and blocks execution 
+ * until the primary account acquires spendable DUST coins. Prevents 
+ * `Wallet.InsufficientFunds` errors during automated test and CI flows.
+ * 
+ * @license Apache-2.0
+ * @copyright Midnight Foundation & Mustafa Colak
+ */
 
 import pino from 'pino';
 import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
