@@ -31,7 +31,7 @@ Follow these steps to run the project locally on your machine:
 
    ```bash
    git clone https://github.com/mustafaColak0/midnight-project-v1.git
-   cd midnight-level1
+   cd midnight-project-v1
    ```
 
 2. **Install Dependencies:**
