@@ -4,7 +4,7 @@ This repository contains the Level 1 submission for the Midnight Network develop
 
 ## 💡 Initial Product Idea
 
- I aim to develop a privacy-focused voting system on the Midnight Network. By leveraging Zero-Knowledge proofs, users can cast their votes while keeping their identity and choice completely confidential using a **Private Witness**. At the same time, aggregate vote counts and competition results are updated on the **Public Ledger**, ensuring the outcome is fully verifiable by the public without compromising individual voter privacy.
+I aim to develop a privacy-focused voting system on the Midnight Network. By leveraging Zero-Knowledge proofs, users can cast their votes while keeping their identity and choice completely confidential using a **Private Witness**. At the same time, aggregate vote counts and competition results are updated on the **Public Ledger**, ensuring the outcome is fully verifiable by the public without compromising individual voter privacy.
 
 ## 🔐 Public Ledger vs Private Witness & `declose()`
 
@@ -30,8 +30,8 @@ Follow these steps to run the project locally on your machine:
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/mustafaColak0/midnight-level1.git
-   cd stellar-shield-wallet
+   git clone https://github.com/mustafaColak0/midnight-project-v1.git
+   cd midnight-level1
    ```
 
 2. **Install Dependencies:**
@@ -60,20 +60,7 @@ Follow these steps to run the project locally on your machine:
 📸 Proof of Completion (Screenshots)
 
 1. Successful Compilation Output (Circuits Generated)
-  <img width="750" height="307" alt="build-circuits" src="https://github.com/user-attachments/assets/e0a16af3-5de3-497d-835a-a38d120075f5" />
-
+   <img width="750" height="307" alt="build-circuits" src="https://github.com/user-attachments/assets/e0a16af3-5de3-497d-835a-a38d120075f5" />
 
 2. Contract Deployed with Visible Address
-<img width="1168" height="621" alt="midnight-success" src="https://github.com/user-attachments/assets/60de336d-4a7a-4271-b798-7ccbd2f11eca" />
-
-
-
-
-
-
-
-
-
-
-
-
+   <img width="1168" height="621" alt="midnight-success" src="https://github.com/user-attachments/assets/60de336d-4a7a-4271-b798-7ccbd2f11eca" />
