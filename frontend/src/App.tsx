@@ -18,11 +18,9 @@ export default function App() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // Oylama State'leri (Demo UI)
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [hasVoted, setHasVoted] = useState<boolean>(false);
 
-  // Otomatik Bağlantı Kontrolü
   useEffect(() => {
     checkExistingConnection();
   }, []);
@@ -32,14 +30,17 @@ export default function App() {
       const midnight = (window as any).midnight;
       const wallet = midnight?.mnLace || Object.values(midnight || {})[0];
       if (wallet) {
-        const isEnabled = await wallet.isEnabled?.();
-        if (isEnabled) {
-          const connectedApi = await wallet.enable();
-          const { unshieldedAddress } = await connectedApi.getUnshieldedAddress();
-          if (unshieldedAddress) {
-            setWalletAddress(unshieldedAddress);
-            setIsConnected(true);
-          }
+        // Güvenli metod çağırma
+        const connectedApi = typeof wallet.enable === 'function' 
+          ? await wallet.enable() 
+          : typeof wallet.connect === 'function' 
+          ? await wallet.connect('preprod') 
+          : wallet;
+
+        const { unshieldedAddress } = await connectedApi.getUnshieldedAddress();
+        if (unshieldedAddress) {
+          setWalletAddress(unshieldedAddress);
+          setIsConnected(true);
         }
       }
     } catch {
@@ -56,13 +57,19 @@ export default function App() {
       const wallet = midnight?.mnLace || Object.values(midnight || {})[0];
 
       if (!wallet) {
-        throw new Error(
-          "Midnight / Lace Cüzdan eklentisi bulunamadı! Lütfen Lace Wallet eklentisini kurun."
-        );
+        throw new Error("Midnight / Lace Cüzdan eklentisi bulunamadı!");
       }
 
-      await wallet.enable();
-      const connectedApi = await wallet.connect("preprod");
+      // Esnek API Desteği (Hata almamak için tüm yöntemler)
+      let connectedApi;
+      if (typeof wallet.connect === "function") {
+        connectedApi = await wallet.connect("preprod");
+      } else if (typeof wallet.enable === "function") {
+        connectedApi = await wallet.enable();
+      } else {
+        connectedApi = wallet;
+      }
+
       const { unshieldedAddress } = await connectedApi.getUnshieldedAddress();
 
       setWalletAddress(unshieldedAddress);
@@ -72,9 +79,9 @@ export default function App() {
       setError(
         err.message || "Cüzdana bağlanırken bir sorun oluştu. Ağın Preprod olduğundan emin olun."
       );
-    } finally {
-      setLoading(false);
-    }
+   } finally {
+  setLoading(false);
+}
   };
 
   const handleDisconnect = () => {
@@ -95,11 +102,10 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-purple-500 selection:text-white p-4 md:p-8">
-      {/* Container */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans p-4 md:p-8">
       <div className="max-w-5xl mx-auto space-y-6">
-        {/* TOP BAR / HEADER */}
-        <header className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-slate-900/80 border border-slate-800 rounded-2xl backdrop-blur-md shadow-2xl">
+        {/* HEADER */}
+        <header className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-slate-900/80 border border-slate-800 rounded-2xl shadow-2xl">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-purple-500/10 border border-purple-500/20 rounded-xl text-purple-400">
               <Lock className="w-6 h-6 animate-pulse" />
@@ -119,7 +125,6 @@ export default function App() {
             </div>
           </div>
 
-          {/* Network & Status Badges */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/80 border border-slate-700/60 rounded-lg text-xs">
               <Radio className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
@@ -143,7 +148,6 @@ export default function App() {
           </div>
         </header>
 
-        {/* ERROR NOTICE */}
         {error && (
           <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -159,7 +163,7 @@ export default function App() {
           </div>
         )}
 
-        {/* MAIN PANEL GRID */}
+        {/* MAIN PANEL */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* WALLET CARD */}
           <div className="p-5 bg-slate-900/60 border border-slate-800 rounded-2xl flex flex-col justify-between space-y-4 shadow-lg">
@@ -204,13 +208,12 @@ export default function App() {
               )}
             </div>
 
-            {/* Wallet Action Button */}
             <div>
               {!isConnected ? (
                 <button
                   onClick={handleConnect}
                   disabled={loading}
-                  className="w-full py-2.5 px-4 bg-purple-600 hover:bg-purple-500 active:bg-purple-700 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-600/20 cursor-pointer disabled:opacity-50"
+                  className="w-full py-2.5 px-4 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
                 >
                   <Wallet className="w-4 h-4" />
                   {loading ? "Connecting..." : "Connect Midnight Wallet"}
@@ -226,7 +229,7 @@ export default function App() {
             </div>
           </div>
 
-          {/* VOTING INTERACTION CARD */}
+          {/* VOTING CARD */}
           <div className="md:col-span-2 p-5 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-5 shadow-lg">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
               <span className="text-xs font-semibold uppercase text-slate-400 tracking-wider flex items-center gap-2">
@@ -240,11 +243,10 @@ export default function App() {
                 Should Midnight Network adopt hybrid sidechain consensus in Q4?
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Your vote will be encrypted on-chain using zero-knowledge circuits. Your wallet address will remain undisclosed to the public ledger.
+                Your vote will be encrypted on-chain using zero-knowledge circuits.
               </p>
             </div>
 
-            {/* Poll Options */}
             <div className="space-y-2">
               {[
                 { id: "option_a", title: "Option A: Yes, approve proposal" },
@@ -277,7 +279,6 @@ export default function App() {
               ))}
             </div>
 
-            {/* Vote Action Area */}
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
               {!isConnected ? (
                 <span className="text-xs text-amber-400/80 font-mono">
@@ -306,7 +307,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* ON-CHAIN STREAM & PROOFS TABLE */}
+        {/* TABLE */}
         <div className="border border-slate-800 rounded-2xl overflow-hidden bg-slate-900/40 shadow-xl">
           <div className="px-5 py-3.5 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
@@ -330,9 +331,7 @@ export default function App() {
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
                 <tr className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-5 py-3 text-purple-300 font-semibold">
-                    0x8a91...4c92
-                  </td>
+                  <td className="px-5 py-3 text-purple-300 font-semibold">0x8a91...4c92</td>
                   <td className="px-5 py-3">
                     <span className="bg-purple-500/10 text-purple-300 border border-purple-500/20 px-2 py-0.5 rounded text-[11px]">
                       ZK_VOTE_RECORD
@@ -345,34 +344,7 @@ export default function App() {
                     </span>
                   </td>
                   <td className="px-5 py-3 text-right">
-                    <a
-                      href="#"
-                      className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-purple-300 bg-slate-800 px-2 py-1 rounded border border-slate-700"
-                    >
-                      Proof <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </td>
-                </tr>
-                <tr className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-5 py-3 text-purple-300 font-semibold">
-                    0x3f12...e011
-                  </td>
-                  <td className="px-5 py-3">
-                    <span className="bg-purple-500/10 text-purple-300 border border-purple-500/20 px-2 py-0.5 rounded text-[11px]">
-                      ZK_VOTE_RECORD
-                    </span>
-                  </td>
-                  <td className="px-5 py-3">
-                    <span className="inline-flex items-center gap-1.5 text-emerald-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                      Shielded & Proven
-                    </span>
-                  </td>
-                  <td className="px-5 py-3 text-right">
-                    <a
-                      href="#"
-                      className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-purple-300 bg-slate-800 px-2 py-1 rounded border border-slate-700"
-                    >
+                    <a href="#" className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-purple-300 bg-slate-800 px-2 py-1 rounded border border-slate-700">
                       Proof <ExternalLink className="w-3 h-3" />
                     </a>
                   </td>
