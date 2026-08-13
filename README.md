@@ -16,6 +16,33 @@ In Midnight's Compact smart contracts:
 
 ---
 
+
+## 🔌 Midnight Wallet Connection
+
+### Previous Review Feedback Addressed ✅
+
+**Previous feedback:**
+
+> Please implement Connect Wallet feature.
+
+This feedback has now been addressed.
+
+The project includes a functional Midnight wallet connection implemented with
+the Midnight DApp Connector API.
+
+The DApp can:
+
+- Detect an installed Midnight-compatible wallet
+- Request wallet authorization
+- Connect to the Midnight **Preprod** network
+- Display the connected wallet status
+- Display the connected unshielded public address
+- Disconnect the wallet from the DApp interface
+
+Wallet discovery is performed dynamically through `window.midnight`.
+
+The application does not request the user's private key or seed phrase.
+
 ## 🛠️ Setup & Local Execution Instructions
 
 Follow these steps to run the project locally on your machine:
@@ -53,8 +80,14 @@ Follow these steps to run the project locally on your machine:
    ```
 
 5. **Deploy to Preview/Pre-production:**
+
    ```bash
    npm run deploy
+   ```
+7. **Wallet Integration :**
+
+   ```bash
+   @midnight-ntwrk/dapp-connector-api
    ```
 
 📸 Proof of Completion (Screenshots)
@@ -65,4 +98,10 @@ Follow these steps to run the project locally on your machine:
 
 2. Contract Deployed with Visible Address
 <img width="1168" height="621" alt="midnight-success" src="https://github.com/user-attachments/assets/11a6d3eb-3f01-4a15-b930-800be09ab8b9" />
+
+3. Wallet Connection
+<img width="1052" height="786" alt="wallet_success" src="https://github.com/user-attachments/assets/c07c6988-91f9-45cd-b446-c351f3e878bb" />
+
+
+
 
