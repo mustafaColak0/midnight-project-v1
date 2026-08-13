@@ -60,7 +60,9 @@ Follow these steps to run the project locally on your machine:
 📸 Proof of Completion (Screenshots)
 
 1. Successful Compilation Output (Circuits Generated)
-   <img width="750" height="307" alt="build-circuits" src="https://github.com/user-attachments/assets/e0a16af3-5de3-497d-835a-a38d120075f5" />
+<img width="750" height="307" alt="build-circuits" src="https://github.com/user-attachments/assets/341f7e84-187d-4205-a478-0cb4aa5880ab" />
+
 
 2. Contract Deployed with Visible Address
-   <img width="1168" height="621" alt="midnight-success" src="https://github.com/user-attachments/assets/60de336d-4a7a-4271-b798-7ccbd2f11eca" />
+<img width="1168" height="621" alt="midnight-success" src="https://github.com/user-attachments/assets/11a6d3eb-3f01-4a15-b930-800be09ab8b9" />
+
