@@ -13,8 +13,14 @@ import {
 } from "lucide-react";
 
 export default function App() {
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [walletAddress, setWalletAddress] = useState<string | null>(() => {
+    return localStorage.getItem("midnight_wallet_addr");
+  });
+
+  const [isConnected, setIsConnected] = useState<boolean>(() => {
+    return !!localStorage.getItem("midnight_wallet_addr");
+  });
+
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
@@ -22,31 +28,39 @@ export default function App() {
   const [hasVoted, setHasVoted] = useState<boolean>(false);
 
   useEffect(() => {
-    checkExistingConnection();
-  }, []);
+    const savedAddr = localStorage.getItem("midnight_wallet_addr");
+    if (!savedAddr) return;
 
-  const checkExistingConnection = async () => {
-    try {
-      const midnight = (window as any).midnight;
-      const wallet = midnight?.mnLace || Object.values(midnight || {})[0];
-      if (wallet) {
-        // Güvenli metod çağırma
-        const connectedApi = typeof wallet.enable === 'function' 
-          ? await wallet.enable() 
-          : typeof wallet.connect === 'function' 
-          ? await wallet.connect('preprod') 
-          : wallet;
+    const timer = setTimeout(async () => {
+      try {
+        const midnight = (window as any).midnight;
+        const wallet = midnight?.mnLace || Object.values(midnight || {})[0];
 
-        const { unshieldedAddress } = await connectedApi.getUnshieldedAddress();
-        if (unshieldedAddress) {
-          setWalletAddress(unshieldedAddress);
-          setIsConnected(true);
+        if (wallet) {
+          let connectedApi;
+          if (typeof wallet.connect === "function") {
+            connectedApi = await wallet.connect("preprod");
+          } else if (typeof wallet.enable === "function") {
+            connectedApi = await wallet.enable();
+          } else {
+            connectedApi = wallet;
+          }
+
+          const { unshieldedAddress } =
+            await connectedApi.getUnshieldedAddress();
+          if (unshieldedAddress) {
+            setWalletAddress(unshieldedAddress);
+            localStorage.setItem("midnight_wallet_addr", unshieldedAddress);
+            setIsConnected(true);
+          }
         }
+      } catch (e) {
+        console.log("Arka plan cüzdan kontrolü tamamlandı.");
       }
-    } catch {
-      console.log("Henüz bağlı cüzdan yok.");
-    }
-  };
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleConnect = async () => {
     setLoading(true);
@@ -60,7 +74,6 @@ export default function App() {
         throw new Error("Midnight / Lace Cüzdan eklentisi bulunamadı!");
       }
 
-      // Esnek API Desteği (Hata almamak için tüm yöntemler)
       let connectedApi;
       if (typeof wallet.connect === "function") {
         connectedApi = await wallet.connect("preprod");
@@ -74,14 +87,13 @@ export default function App() {
 
       setWalletAddress(unshieldedAddress);
       setIsConnected(true);
+      localStorage.setItem("midnight_wallet_addr", unshieldedAddress);
     } catch (err: any) {
       console.error("Cüzdan bağlama hatası:", err);
-      setError(
-        err.message || "Cüzdana bağlanırken bir sorun oluştu. Ağın Preprod olduğundan emin olun."
-      );
-   } finally {
-  setLoading(false);
-}
+      setError(err.message || "Cüzdana bağlanırken bir sorun oluştu.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDisconnect = () => {
@@ -89,6 +101,7 @@ export default function App() {
     setIsConnected(false);
     setHasVoted(false);
     setSelectedOption(null);
+    localStorage.removeItem("midnight_wallet_addr");
   };
 
   const handleVote = () => {
@@ -120,7 +133,8 @@ export default function App() {
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Zero-Knowledge shielded state architecture on Cardano / Midnight.
+                Zero-Knowledge shielded state architecture on Cardano /
+                Midnight.
               </p>
             </div>
           </div>
@@ -202,7 +216,8 @@ export default function App() {
                 <div className="py-8 text-center space-y-2">
                   <Lock className="w-8 h-8 text-slate-600 mx-auto" />
                   <p className="text-xs text-slate-400">
-                    Connect your Midnight Lace wallet to interact with the ZK Voting Contract.
+                    Connect your Midnight Lace wallet to interact with the ZK
+                    Voting Contract.
                   </p>
                 </div>
               )}
@@ -233,9 +248,12 @@ export default function App() {
           <div className="md:col-span-2 p-5 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-5 shadow-lg">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
               <span className="text-xs font-semibold uppercase text-slate-400 tracking-wider flex items-center gap-2">
-                <Vote className="w-4 h-4 text-purple-400" /> Active Anonymous Poll
+                <Vote className="w-4 h-4 text-purple-400" /> Active Anonymous
+                Poll
               </span>
-              <span className="text-xs text-slate-500 font-mono">Compact Proof #01</span>
+              <span className="text-xs text-slate-500 font-mono">
+                Compact Proof #01
+              </span>
             </div>
 
             <div className="space-y-2">
@@ -243,14 +261,18 @@ export default function App() {
                 Should Midnight Network adopt hybrid sidechain consensus in Q4?
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Your vote will be encrypted on-chain using zero-knowledge circuits.
+                Your vote will be encrypted on-chain using zero-knowledge
+                circuits.
               </p>
             </div>
 
             <div className="space-y-2">
               {[
                 { id: "option_a", title: "Option A: Yes, approve proposal" },
-                { id: "option_b", title: "Option B: No, keep current parameters" },
+                {
+                  id: "option_b",
+                  title: "Option B: No, keep current parameters",
+                },
                 { id: "option_c", title: "Option C: Abstain / Neutral" },
               ].map((opt) => (
                 <button
@@ -287,12 +309,16 @@ export default function App() {
               ) : hasVoted ? (
                 <div className="flex items-center gap-2 text-xs text-emerald-400 font-medium bg-emerald-500/10 px-3 py-2 rounded-xl border border-emerald-500/20 w-full">
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Vote submitted on-chain! ZK Proof generated successfully.</span>
+                  <span>
+                    Vote submitted on-chain! ZK Proof generated successfully.
+                  </span>
                 </div>
               ) : (
                 <>
                   <span className="text-xs text-slate-400 font-mono">
-                    {selectedOption ? "Ready to generate proof" : "Select an option above"}
+                    {selectedOption
+                      ? "Ready to generate proof"
+                      : "Select an option above"}
                   </span>
                   <button
                     disabled={!selectedOption}
@@ -331,7 +357,9 @@ export default function App() {
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
                 <tr className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-5 py-3 text-purple-300 font-semibold">0x8a91...4c92</td>
+                  <td className="px-5 py-3 text-purple-300 font-semibold">
+                    0x8a91...4c92
+                  </td>
                   <td className="px-5 py-3">
                     <span className="bg-purple-500/10 text-purple-300 border border-purple-500/20 px-2 py-0.5 rounded text-[11px]">
                       ZK_VOTE_RECORD
@@ -344,8 +372,14 @@ export default function App() {
                     </span>
                   </td>
                   <td className="px-5 py-3 text-right">
-                    <a href="#" className="inline-flex items-center gap-1 text-[11px] text-slate-400 hover:text-purple-300 bg-slate-800 px-2 py-1 rounded border border-slate-700">
-                      Proof <ExternalLink className="w-3 h-3" />
+                    <a
+                      href="https://explorer.preprod.midnight.network"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-end gap-1.5 text-[11px] text-slate-400 hover:text-purple-300 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700/60 transition-colors ml-auto"
+                    >
+                      <span>Proof</span>
+                      <ExternalLink className="w-3 h-3 shrink-0" />
                     </a>
                   </td>
                 </tr>
