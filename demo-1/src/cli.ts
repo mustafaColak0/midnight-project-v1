@@ -187,7 +187,8 @@ async function main() {
             console.log(`  Transaction ID: ${tx.public.txId}`);
             console.log(`  Block height: ${tx.public.blockHeight}\n`);
           } catch (error) {
-            console.error('\n  ❌ Failed:', error instanceof Error ? error.message : error);
+            console.error('\n  ❌ Failed - FULL ERROR:');
+            console.error(error);
           }
           break;
         }
