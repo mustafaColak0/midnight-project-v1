@@ -16,7 +16,6 @@ In Midnight's Compact smart contracts:
 
 ---
 
-<<<<<<< HEAD
 ## 🔌 Midnight Wallet Connection
 
 ### Previous Review Feedback Addressed ✅
