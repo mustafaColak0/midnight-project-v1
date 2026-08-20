@@ -1,12 +1,20 @@
-pragma language_version >= 0.17.0;
+pragma language_version 0.23;
 
 import CompactStandardLibrary;
 
-// Public ledger state - visible on blockchain
+// Public ledger state
 export ledger message: Opaque<"string">;
+export ledger thresholdProofVerified: Boolean;
 
-// Circuit to store a message on the blockchain
-// The message will be publicly visible
+// Existing public message circuit
 export circuit storeMessage(customMessage: Opaque<"string">): [] {
     message = disclose(customMessage);
+}
+
+// Privacy demo:
+// secretValue remains private.
+// The circuit only proves that it is >= 18.
+export circuit proveThreshold(secretValue: Uint<16>): [] {
+    assert(secretValue >= 18, "Secret value is below threshold");
+    thresholdProofVerified = true;
 }

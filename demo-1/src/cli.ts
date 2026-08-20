@@ -171,63 +171,131 @@ async function main() {
     while (running) {
       console.log('─── Menu ───────────────────────────────────────────────────────');
       console.log('  1. Store a message');
-      console.log('  2. Read current message');
-      console.log('  3. Check wallet balance');
-      console.log('  4. Exit\n');
+      console.log('  2. Prove private threshold');
+      console.log('  3. Read current message');
+      console.log('  4. Check wallet balance');
+      console.log('  5. Exit\n');
 
       const choice = await rl.question('  Your choice: ');
 
-      switch (choice.trim()) {
-        case '1': {
-          const message = await rl.question('  Enter your message: ');
-          console.log('\n  Submitting transaction (this may take 30-60 seconds)...');
-          try {
-            const tx = await deployed.callTx.storeMessage(message);
-            console.log(`\n  ✅ Message stored: "${message}"`);
-            console.log(`  Transaction ID: ${tx.public.txId}`);
-            console.log(`  Block height: ${tx.public.blockHeight}\n`);
-          } catch (error) {
-            console.error('\n  ❌ Failed - FULL ERROR:');
-            console.error(error);
-          }
-          break;
-        }
+switch (choice.trim()) {
+  case '1': {
+    const message = await rl.question('  Enter your message: ');
+    console.log('\n  Submitting transaction (this may take 30-60 seconds)...');
 
-        case '2': {
-          console.log('\n  Reading message from blockchain...');
-          try {
-            const contractState = await providers.publicDataProvider.queryContractState(deployment.address);
-            if (contractState) {
-              const ledgerState = HelloWorld.ledger(contractState.data);
-              const message = Buffer.from(ledgerState.message).toString();
-              console.log(`\n  📋 Current message: "${message}"\n`);
-            } else {
-              console.log('\n  📋 No message found (contract state empty)\n');
-            }
-          } catch (error) {
-            console.error('\n  ❌ Failed:', error instanceof Error ? error.message : error);
-          }
-          break;
-        }
+    try {
+      const tx = await deployed.callTx.storeMessage(message);
 
-        case '3': {
-          console.log('\n  Checking balance...');
-          const currentState = await walletCtx.wallet.waitForSyncedState();
-          const currentBalance = currentState.unshielded.balances[unshieldedToken().raw] ?? 0n;
-          const dustBalance = currentState.dust.balance(new Date());
-          console.log(`\n  tNight: ${currentBalance.toLocaleString()}`);
-          console.log(`  DUST: ${dustBalance.toLocaleString()}\n`);
-          break;
-        }
+      console.log(`\n  ✅ Message stored: "${message}"`);
+      console.log(`  Transaction ID: ${tx.public.txId}`);
+      console.log(`  Block height: ${tx.public.blockHeight}\n`);
+    } catch (error) {
+      console.error('\n  ❌ Failed - FULL ERROR:');
+      console.error(error);
+    }
 
-        case '4':
-          running = false;
-          console.log('\n  👋 Goodbye!\n');
-          break;
+    break;
+  }
 
-        default:
-          console.log('\n  ❌ Invalid choice. Please enter 1-4.\n');
+  case '2': {
+    const input = await rl.question(
+      '  Enter private value to prove it is >= 18: ',
+    );
+
+    if (!/^\d+$/.test(input.trim())) {
+      console.log('\n  ❌ Please enter a valid positive integer.\n');
+      break;
+    }
+
+    const secretValue = BigInt(input.trim());
+
+    if (secretValue > 65535n) {
+      console.log('\n  ❌ Value must fit inside Uint<16> (0-65535).\n');
+      break;
+    }
+
+    console.log('\n  Generating private zero-knowledge proof...');
+    console.log('  Secret value will NOT be written to the public ledger.');
+    console.log('  Submitting transaction (this may take 30-60 seconds)...');
+
+    try {
+      const tx = await deployed.callTx.proveThreshold(secretValue);
+
+      console.log('\n  ✅ Private threshold proof verified!');
+      console.log('  ✅ Proven statement: secret value >= 18');
+      console.log('  🔒 Secret value was not disclosed to the ledger.');
+      console.log(`  Transaction ID: ${tx.public.txId}`);
+      console.log(`  Block height: ${tx.public.blockHeight}`);
+
+      const contractState =
+        await providers.publicDataProvider.queryContractState(
+          deployment.address,
+        );
+
+      if (contractState) {
+        const ledgerState = HelloWorld.ledger(contractState.data);
+
+        console.log(
+          `  Public ledger result: thresholdProofVerified = ${ledgerState.thresholdProofVerified}\n`,
+        );
       }
+    } catch (error) {
+      console.error('\n  ❌ Proof failed - FULL ERROR:');
+      console.error(error);
+    }
+
+    break;
+  }
+
+  case '3': {
+    console.log('\n  Reading message from blockchain...');
+
+    try {
+      const contractState =
+        await providers.publicDataProvider.queryContractState(
+          deployment.address,
+        );
+
+      if (contractState) {
+        const ledgerState = HelloWorld.ledger(contractState.data);
+        const message = Buffer.from(ledgerState.message).toString();
+
+        console.log(`\n  📋 Current message: "${message}"\n`);
+      } else {
+        console.log('\n  📋 No message found (contract state empty)\n');
+      }
+    } catch (error) {
+      console.error(
+        '\n  ❌ Failed:',
+        error instanceof Error ? error.message : error,
+      );
+    }
+
+    break;
+  }
+
+  case '4': {
+    console.log('\n  Checking balance...');
+
+    const currentState = await walletCtx.wallet.waitForSyncedState();
+    const currentBalance =
+      currentState.unshielded.balances[unshieldedToken().raw] ?? 0n;
+    const dustBalance = currentState.dust.balance(new Date());
+
+    console.log(`\n  tNight: ${currentBalance.toLocaleString()}`);
+    console.log(`  DUST: ${dustBalance.toLocaleString()}\n`);
+
+    break;
+  }
+
+  case '5':
+    running = false;
+    console.log('\n  👋 Goodbye!\n');
+    break;
+
+  default:
+    console.log('\n  ❌ Invalid choice. Please enter 1-5.\n');
+}
     }
 
     await persistWalletState(network, walletCtx);
