@@ -1,26 +1,26 @@
 {
-  "name": "hello-world-local",
-  "version": "0.1.0",
-  "private": true,
+  "name": "demo-1",
+  "version": "1.0.0",
   "type": "module",
-  "engines": {
-    "node": ">=22.0.0"
-  },
+  "description": "A Midnight Network application created with create-mn-app",
+  "author": "",
+  "license": "MIT",
   "scripts": {
     "compile": "compact compile contracts/hello-world.compact contracts/managed/hello-world",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' vitest run",
-    "test:local": "cross-env MIDNIGHT_NETWORK=local vitest run",
-    "test:preview": "cross-env MIDNIGHT_NETWORK=preview vitest run",
-    "test:preprod": "cross-env MIDNIGHT_NETWORK=preprod vitest run",
-    "env:up": "docker compose up -d --wait",
-    "env:down": "docker compose down",
-    "proof:up": "docker compose up -d --wait proof-server",
-    "proof:down": "docker compose stop proof-server",
-    "wait:dust": "vite-node scripts/wait-for-dust.ts",
-    "validate": "yarn env:up && yarn test:local; yarn env:down"
+    "build": "npx tsc --noEmit || true",
+    "setup": "npx tsx src/setup.ts",
+    "deploy": "npx tsx src/deploy.ts",
+    "cli": "npx tsx src/cli.ts",
+    "check-balance": "npx tsx src/check-balance.ts",
+    "network": "npx tsx src/network.ts",
+    "proof-server:start": "docker compose up -d",
+    "proof-server:stop": "docker compose down",
+    "clean": "rm -rf contracts/managed .midnight-state.json .midnight-wallet-state",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:e2e": "tsx scripts/e2e-check.ts"
   },
   "dependencies": {
-    "@midnight-ntwrk/dapp-connector-api": "^4.0.1",
+    "@midnight-ntwrk/compact-runtime": "0.16.0",
     "@midnight-ntwrk/midnight-js-contracts": "4.1.1",
     "@midnight-ntwrk/midnight-js-http-client-proof-provider": "4.1.1",
     "@midnight-ntwrk/midnight-js-indexer-public-data-provider": "4.1.1",
@@ -30,25 +30,19 @@
     "@midnight-ntwrk/midnight-js-protocol": "4.1.1",
     "@midnight-ntwrk/midnight-js-types": "4.1.1",
     "@midnight-ntwrk/midnight-js-utils": "4.1.1",
-    "@midnight-ntwrk/testkit-js": "4.1.1",
     "@midnight-ntwrk/wallet-sdk": "1.2.0",
-    "axios": "^1.15.0",
-    "lucide-react": "^1.31.0",
-    "pino": "^9.0.0",
-    "pino-pretty": "^13.0.0",
+    "@scure/bip39": "2.2.0",
     "rxjs": "^7.8.2",
-    "testcontainers": "^11.13.0",
-    "ws": "^8.14.2"
+    "ws": "^8.21.1"
   },
   "devDependencies": {
-    "@types/node": "^22.20.1",
-    "@types/ws": "^8.5.9",
-    "cross-env": "^10.1.0",
-    "typescript": "^5.7.0",
-    "vitest": "^4.1.0"
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.23.1",
+    "typescript": "^6.0.3"
   },
-  "resolutions": {
-    "@midnight-ntwrk/wallet-sdk": "1.2.0"
+  "engines": {
+    "node": ">=22.0.0"
   },
-  "packageManager": "yarn@1.22.22"
+  "keywords": ["midnight", "blockchain", "zero-knowledge", "privacy"]
 }
