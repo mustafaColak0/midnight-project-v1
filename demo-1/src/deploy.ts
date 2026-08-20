@@ -1,3 +1,4 @@
+/*SAFE_PATCH_FINAL*/
 /**
  * Deploy demo-1 contract to a Midnight network (undeployed by default; use --network preview|preprod for public networks).
  *
