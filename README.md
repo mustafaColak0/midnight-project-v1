@@ -84,9 +84,6 @@ Follow these steps to run the project locally on your machine:
    npm run deploy
    ```
 
-6. **Wallet Integration :**
-=======
-
 ## 🔌 Midnight Wallet Connection
 
 ### Previous Review Feedback Addressed ✅
@@ -155,7 +152,6 @@ Follow these steps to run the project locally on your machine:
    npm run deploy
    ```
 7. **Wallet Integration :**
->>>>>>> 24aec324f1bc744d92ced05b6635c581bf135b5f
 
    ```bash
    @midnight-ntwrk/dapp-connector-api
@@ -164,7 +160,6 @@ Follow these steps to run the project locally on your machine:
 📸 Proof of Completion (Screenshots)
 
 1. Successful Compilation Output (Circuits Generated)
-<<<<<<< HEAD
    <img width="750" height="307" alt="build-circuits" src="https://github.com/user-attachments/assets/341f7e84-187d-4205-a478-0cb4aa5880ab" />
 
 2. Contract Deployed with Visible Address
@@ -172,17 +167,8 @@ Follow these steps to run the project locally on your machine:
 
 3. Wallet Connection
    <img width="1052" height="786" alt="wallet_success" src="https://github.com/user-attachments/assets/c07c6988-91f9-45cd-b446-c351f3e878bb" />
-=======
-<img width="750" height="307" alt="build-circuits" src="https://github.com/user-attachments/assets/341f7e84-187d-4205-a478-0cb4aa5880ab" />
-
-
-2. Contract Deployed with Visible Address
-<img width="1168" height="621" alt="midnight-success" src="https://github.com/user-attachments/assets/11a6d3eb-3f01-4a15-b930-800be09ab8b9" />
-
-3. Wallet Connection
-<img width="1052" height="786" alt="wallet_success" src="https://github.com/user-attachments/assets/c07c6988-91f9-45cd-b446-c351f3e878bb" />
 
 
 
 
->>>>>>> 24aec324f1bc744d92ced05b6635c581bf135b5f
+
