@@ -7,7 +7,7 @@ import type { MidnightProviders } from '@midnight-ntwrk/midnight-js-types'
 import type { HelloWorldCircuitId } from './providers'
 
 export const CONTRACT_ADDRESS =
-  'eed3a573690e9dcb9acaaea0d0ee1b078c3ab0678132fffb7ee8e3ccb91fee6f'
+  "82265fe547d93fda1dcc12c31f9ccc2a5b3a421c8cd3f1fbc072bad332b8192a";
 
 export const compiledHelloWorldContract =
   CompiledContract.make(
@@ -35,6 +35,43 @@ export async function findHelloWorldContract(
   )
 
   console.log('[Midnight] Contract found.')
+  const rawState =
+  await providers.publicDataProvider.queryContractState(
+    CONTRACT_ADDRESS,
+  );
+
+console.log(
+  "[DEBUG] Raw contract state:",
+  rawState,
+);
+
+console.log(
+  "[DEBUG] State data constructor:",
+  rawState?.data?.constructor?.name,
+);
+
+if (!rawState) {
+  throw new Error(
+    "Contract state could not be loaded from Preprod.",
+  );
+}
+
+try {
+  const decodedLedger =
+    HelloWorld.ledger(rawState.data);
+
+  console.log(
+    "[DEBUG] Decoded ledger:",
+    decodedLedger,
+  );
+} catch (error) {
+  console.error(
+    "[DEBUG] LEDGER DECODE FAILED:",
+    error,
+  );
+
+  throw error;
+}
 
   return contract
 }

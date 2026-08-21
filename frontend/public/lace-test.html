@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>Lace Midnight Test</title>
+</head>
+
+<body>
+  <h1>Lace Midnight Diagnostic</h1>
+
+  <button id="connect">
+    Connect Lace Preprod
+  </button>
+
+  <pre id="log"></pre>
+
+  <script>
+    const output =
+      document.getElementById('log')
+
+    function log(...args) {
+      console.log(...args)
+
+      output.textContent +=
+        args
+          .map(value => {
+            try {
+              return typeof value === 'string'
+                ? value
+                : JSON.stringify(value, null, 2)
+            } catch {
+              return String(value)
+            }
+          })
+          .join(' ') + '\n'
+    }
+
+    function getLace() {
+      return Object
+        .values(window.midnight ?? {})
+        .find(wallet =>
+          wallet?.rdns === 'io.lace.wallet' ||
+          String(wallet?.name)
+            .toLowerCase() === 'lace'
+        )
+    }
+
+    document
+      .getElementById('connect')
+      .addEventListener(
+        'click',
+        async () => {
+          const button =
+            document.getElementById('connect')
+
+          button.disabled = true
+
+          log(
+            '=============================='
+          )
+
+          log('1. Looking for Lace...')
+
+          const lace = getLace()
+
+          log('Lace:', {
+            found: Boolean(lace),
+            name: lace?.name,
+            rdns: lace?.rdns,
+            apiVersion: lace?.apiVersion,
+          })
+
+          if (!lace) {
+            log('❌ Lace not injected.')
+            button.disabled = false
+            return
+          }
+
+          try {
+            log(
+              '2. Calling connect("preprod") ONCE...'
+            )
+
+            const api =
+              await lace.connect('preprod')
+
+            log('✅ CONNECT RETURNED')
+
+            log(
+              '3. Calling getConnectionStatus...'
+            )
+
+            const status =
+              await api.getConnectionStatus()
+
+            log(
+              '✅ STATUS:',
+              status
+            )
+
+            log(
+              '4. Calling getConfiguration...'
+            )
+
+            const config =
+              await api.getConfiguration()
+
+            log(
+              '✅ CONFIG:',
+              config
+            )
+
+            log(
+              '5. Calling getUnshieldedAddress...'
+            )
+
+            const address =
+              await api.getUnshieldedAddress()
+
+            log(
+              '✅ ADDRESS:',
+              address
+            )
+
+            log('')
+            log(
+              '🔥 LACE MIDNIGHT CONNECTOR WORKS'
+            )
+
+            window.testLaceApi = api
+          } catch (error) {
+            console.error(error)
+
+            log('')
+            log('❌ ERROR')
+
+            log(
+              'name:',
+              error?.name
+            )
+
+            log(
+              'message:',
+              error?.message
+            )
+
+            log(
+              'code:',
+              error?.code
+            )
+
+            log(
+              'reason:',
+              error?.reason
+            )
+
+            log(
+              'stack:',
+              error?.stack
+            )
+          } finally {
+            button.disabled = false
+          }
+        }
+      )
+  </script>
+</body>
+</html>

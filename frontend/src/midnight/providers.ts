@@ -14,35 +14,65 @@ export type HelloWorldCircuitId =
   | 'proveThreshold'
   | 'storeMessage'
 
-const PREPROD_PROOF_SERVER =
-  'https://lace-proof-pub.preprod.midnight.network'
 
 function getPrivateStatePassword(): string {
-  const key = 'midnight-level2-private-state-password'
+  const key =
+    'midnight-level2-private-state-password-v2'
 
-  let password = sessionStorage.getItem(key)
+  let password =
+    localStorage.getItem(key)
 
   if (!password) {
-    const random = crypto.randomUUID().replaceAll('-', '')
+    const random =
+      crypto.randomUUID().replaceAll('-', '')
 
-    password = `Midnight-L2-${random}!Aa9`
-    sessionStorage.setItem(key, password)
+    password =
+      `Midnight-L2-${random}!Aa9`
+
+    localStorage.setItem(
+      key,
+      password,
+    )
+
+    console.log(
+      '[Midnight] New persistent private-state password created.',
+    )
   }
 
   return password
 }
 
+
 export async function createMidnightProviders(
   api: WalletConnectedAPI,
 ): Promise<MidnightProviders<HelloWorldCircuitId>> {
-  console.log('[Midnight] Reading Lace configuration...')
 
-  const configuration = await api.getConfiguration()
+  console.log(
+    '[Midnight] Reading Lace configuration...',
+  )
 
-  console.log('[Midnight] Network:', configuration.networkId)
-  console.log('[Midnight] Indexer:', configuration.indexerUri)
+  const configuration =
+    await api.getConfiguration()
 
-  if (configuration.networkId.toLowerCase() !== 'preprod') {
+  console.log(
+    '[Midnight] Network:',
+    configuration.networkId,
+  )
+
+  console.log(
+    '[Midnight] Indexer:',
+    configuration.indexerUri,
+  )
+
+
+  // --------------------------------------------------
+  // NETWORK CHECK
+  // --------------------------------------------------
+
+  if (
+    configuration.networkId.toLowerCase() !==
+    'preprod'
+  ) {
     throw new Error(
       `Lace must be connected to Preprod. Current network: ${configuration.networkId}`,
     )
@@ -50,26 +80,92 @@ export async function createMidnightProviders(
 
   setNetworkId(configuration.networkId)
 
-  const shieldedAddress = await api.getShieldedAddresses()
-  const { unshieldedAddress } =
+
+  // --------------------------------------------------
+  // WALLET ADDRESSES
+  // --------------------------------------------------
+
+  const shieldedAddress =
+    await api.getShieldedAddresses()
+
+  const {
+    unshieldedAddress,
+  } =
     await api.getUnshieldedAddress()
+
+
+  // --------------------------------------------------
+  // SAFE BROWSER FETCH
+  // --------------------------------------------------
+
+  /*
+   * window.fetch doğrudan başka bir provider'a
+   * geçirildiğinde "Illegal invocation" hatası
+   * alabiliyorduk.
+   *
+   * Bu yüzden Window'a bind ediyoruz.
+   */
+
+  const browserFetch: typeof fetch =
+    window.fetch.bind(window)
+
+
+  // --------------------------------------------------
+  // ZK CONFIG
+  // --------------------------------------------------
+
+  /*
+   * Vite public klasöründen:
+   *
+   * /keys/...
+   * /zkir/...
+   *
+   * dosyalarını okuyacak.
+   */
 
   const zkConfigProvider =
     new FetchZkConfigProvider<HelloWorldCircuitId>(
       window.location.origin,
+      browserFetch,
     )
 
-  const proofServer =
-    configuration.proverServerUri ??
-    PREPROD_PROOF_SERVER
 
-  console.log('[Midnight] Proof server:', proofServer)
+  // --------------------------------------------------
+  // PROOF PROVIDER
+  // --------------------------------------------------
 
-  const proofProvider =
-    httpClientProofProvider(
-      proofServer,
-      zkConfigProvider,
-    )
+  /*
+   * Browser doğrudan:
+   *
+   * https://proof-server.preprod.midnight.network
+   *
+   * adresine POST yaptığında CORS 403 alıyoruz.
+   *
+   * Bu yüzden request önce Vite'a gidiyor:
+   *
+   * localhost:5173/midnight-proof
+   *
+   * Vite proxy daha sonra Preprod proof server'a
+   * iletiyor.
+   */
+const proofServer =
+  'https://solid-space-journey-p7gxj6rjgjp3rwgj-6300.app.github.dev'
+
+console.log(
+  '[Midnight] Direct proof server:',
+  proofServer,
+)
+
+const proofProvider =
+  httpClientProofProvider(
+    proofServer,
+    zkConfigProvider,
+  )
+
+
+  // --------------------------------------------------
+  // PUBLIC DATA PROVIDER
+  // --------------------------------------------------
 
   const publicDataProvider =
     indexerPublicDataProvider(
@@ -77,23 +173,42 @@ export async function createMidnightProviders(
       configuration.indexerWsUri,
     )
 
-  const privateStateProvider =
-    levelPrivateStateProvider({
-      midnightDbName: 'midnight-level2',
-      accountId: unshieldedAddress,
-      privateStoragePasswordProvider:
-        getPrivateStatePassword,
-    })
+
+  // --------------------------------------------------
+  // PRIVATE STATE PROVIDER
+  // --------------------------------------------------
+
+const privateStateProvider =
+  levelPrivateStateProvider({
+    midnightDbName: 'midnight-level2-v2',
+    accountId: unshieldedAddress,
+    privateStoragePasswordProvider:
+      getPrivateStatePassword,
+  })
+
+
+  // --------------------------------------------------
+  // LACE WALLET PROVIDERS
+  // --------------------------------------------------
 
   const {
     walletProvider,
     midnightProvider,
-  } = createWalletProviders(
-    api,
-    shieldedAddress,
+  } =
+    createWalletProviders(
+      api,
+      shieldedAddress,
+    )
+
+
+  console.log(
+    '[Midnight] Providers ready.',
   )
 
-  console.log('[Midnight] Providers ready.')
+
+  // --------------------------------------------------
+  // FINAL PROVIDERS
+  // --------------------------------------------------
 
   return {
     privateStateProvider,

@@ -1,20 +1,31 @@
-pragma language_version 0.23;
+﻿pragma language_version 0.23;
 
 import CompactStandardLibrary;
 
 // Public ledger state
-export ledger message: Opaque<"string">;
+export ledger message: Maybe<Opaque<"string">>;
 export ledger thresholdProofVerified: Boolean;
+
+constructor() {
+    message = none<Opaque<"string">>();
+    thresholdProofVerified = false;
+}
 
 // Existing public message circuit
 export circuit storeMessage(customMessage: Opaque<"string">): [] {
-    message = disclose(customMessage);
+    message = disclose(
+        some<Opaque<"string">>(customMessage)
+    );
 }
 
 // Privacy demo:
 // secretValue remains private.
 // The circuit only proves that it is >= 18.
 export circuit proveThreshold(secretValue: Uint<16>): [] {
-    assert(secretValue >= 18, "Secret value is below threshold");
+    assert(
+        secretValue >= 18,
+        "Secret value is below threshold"
+    );
+
     thresholdProofVerified = true;
 }
