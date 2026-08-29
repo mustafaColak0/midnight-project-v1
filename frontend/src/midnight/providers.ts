@@ -149,18 +149,18 @@ export async function createMidnightProviders(
    * iletiyor.
    */
 const proofServer =
-  'https://solid-space-journey-p7gxj6rjgjp3rwgj-6300.app.github.dev'
+  import.meta.env.VITE_PROOF_SERVER_URL?.trim() ||
+  'http://localhost:6300'
 
 console.log(
-  '[Midnight] Direct proof server:',
+  '[Midnight] Proof server:',
   proofServer,
 )
 
-const proofProvider =
-  httpClientProofProvider(
-    proofServer,
-    zkConfigProvider,
-  )
+const proofProvider = httpClientProofProvider(
+  proofServer,
+  zkConfigProvider,
+)
 
 
   // --------------------------------------------------
