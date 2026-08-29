@@ -148,9 +148,9 @@ export async function createMidnightProviders(
    * Vite proxy daha sonra Preprod proof server'a
    * iletiyor.
    */
-const proofServer =
-  import.meta.env.VITE_PROOF_SERVER_URL?.trim() ||
-  'http://localhost:6300'
+const proofServer = import.meta.env.PROD
+  ? `${window.location.origin}/midnight-proof`
+  : 'http://localhost:6300'
 
 console.log(
   '[Midnight] Proof server:',
