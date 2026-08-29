@@ -1,8 +1,12 @@
 {
   "rewrites": [
     {
+      "source": "/midnight-proof",
+      "destination": "https://solid-space-journey-p7gxj6rjgjp3rwgj-6301.app.github.dev"
+    },
+    {
       "source": "/midnight-proof/:path*",
-      "destination": "https://solid-space-journey-p7gxj6rjgjp3rwgj-6300.app.github.dev/:path*"
+      "destination": "https://solid-space-journey-p7gxj6rjgjp3rwgj-6301.app.github.dev/:path*"
     }
   ]
 }
