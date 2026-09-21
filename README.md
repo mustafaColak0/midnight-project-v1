@@ -387,7 +387,7 @@ A compatible Midnight Proof Server must be available to the frontend.
 During development, the proof provider can be configured through:
 
 ```env
-VITE_PROOF_SERVER_URL=http://127.0.0.1:6301
+VITE_PROOF_SERVER_URL=http://127.0.0.1:6302
 ```
 
 The exact URL may differ depending on the local development environment.
