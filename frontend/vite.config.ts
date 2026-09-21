@@ -59,36 +59,10 @@ export default defineConfig({
       '/midnight-proof': {
         target:
           'https://solid-space-journey-p7gxj6rjgjp3rwgj-6300.app.github.dev',
-
         changeOrigin: true,
         secure: true,
-
         rewrite: (path) =>
           path.replace(/^\/midnight-proof/, ''),
-
-        configure: (proxy) => {
-          proxy.on('proxyReq', (proxyReq) => {
-            proxyReq.removeHeader('origin')
-            proxyReq.removeHeader('referer')
-          })
-
-          proxy.on('error', (error) => {
-            console.error(
-              '[Vite Proxy] Proof server error:',
-              error,
-            )
-          })
-
-          proxy.on('proxyRes', (proxyRes, req) => {
-            console.log(
-              '[Vite Proxy]',
-              req.method,
-              req.url,
-              '->',
-              proxyRes.statusCode,
-            )
-          })
-        },
       },
     },
   },

@@ -78,6 +78,166 @@ function fromHex(hex: string): Uint8Array {
   return bytes
 }
 
+/**
+ * Lace / Effect FiberFailure içindeki gerçek hatayı
+ * mümkün olduğunca derin şekilde loglar.
+ */
+function logLaceError(
+  title: string,
+  err: any,
+): void {
+  console.error(
+    `========== ${title} ==========`,
+  )
+
+  console.error(
+    '[Lace ERROR] RAW:',
+    err,
+  )
+
+  console.error(
+    '[Lace ERROR] NAME:',
+    err?.name,
+  )
+
+  console.error(
+    '[Lace ERROR] MESSAGE:',
+    err?.message,
+  )
+
+  console.error(
+    '[Lace ERROR] CODE:',
+    err?.code,
+  )
+
+  console.error(
+    '[Lace ERROR] REASON:',
+    err?.reason,
+  )
+
+  console.error(
+    '[Lace ERROR] TYPE:',
+    err?.type,
+  )
+
+  console.error(
+    '[Lace ERROR] DATA:',
+    err?.data,
+  )
+
+  console.error(
+    '[Lace ERROR] CAUSE:',
+    err?.cause,
+  )
+
+  console.error(
+    '[Lace ERROR] STACK:',
+    err?.stack,
+  )
+
+  const cause = err?.cause
+  const failure = cause?.failure
+
+  console.log(
+    '[Lace ERROR] CAUSE OBJECT:',
+    cause,
+  )
+
+  console.log(
+    '[Lace ERROR] CAUSE KEYS:',
+    cause && typeof cause === 'object'
+      ? Object.keys(cause)
+      : [],
+  )
+
+  console.log(
+    '[Lace ERROR] FAILURE OBJECT:',
+    failure,
+  )
+
+  console.log(
+    '[Lace ERROR] FAILURE KEYS:',
+    failure && typeof failure === 'object'
+      ? Object.keys(failure)
+      : [],
+  )
+
+  if (
+    failure &&
+    typeof failure === 'object'
+  ) {
+    for (
+      const key of Object.keys(failure)
+    ) {
+      console.log(
+        `[Lace ERROR] failure.${key}:`,
+        failure[key],
+      )
+    }
+  }
+
+  console.log(
+    '[Lace ERROR] FAILURE MESSAGE:',
+    failure?.message,
+  )
+
+  console.log(
+    '[Lace ERROR] FAILURE CODE:',
+    failure?.code,
+  )
+
+  console.log(
+    '[Lace ERROR] FAILURE REASON:',
+    failure?.reason,
+  )
+
+  console.log(
+    '[Lace ERROR] FAILURE DATA:',
+    failure?.data,
+  )
+
+  console.log(
+    '[Lace ERROR] FAILURE CAUSE:',
+    failure?.cause,
+  )
+
+  try {
+    const json = JSON.stringify(
+      failure,
+      (_key, value) => {
+        if (typeof value === 'bigint') {
+          return `${value.toString()}n`
+        }
+
+        if (value instanceof Error) {
+          return {
+            name: value.name,
+            message: value.message,
+            stack: value.stack,
+          }
+        }
+
+        return value
+      },
+      2,
+    )
+
+    console.log(
+      '[Lace ERROR] FAILURE JSON:',
+      json,
+    )
+  } catch (jsonError) {
+    console.log(
+      '[Lace ERROR] FAILURE JSON stringify failed:',
+      jsonError,
+    )
+  }
+
+  console.error(
+    '========================================',
+  )
+}
+
 export function createWalletProviders(
   api: WalletConnectedAPI,
   shieldedAddress: ShieldedAddress,
@@ -193,8 +353,13 @@ export function createWalletProviders(
           '[Midnight] ✅ Lace balance response received.',
         )
 
+        console.log(
+          '[Midnight] Raw Lace balance response:',
+          balanced,
+        )
+
         /**
-         * Connector versions may expose the TX
+         * Connector versions may expose TX
          * directly or inside { tx }.
          */
         const balancedHex =
@@ -228,6 +393,11 @@ export function createWalletProviders(
         const balancedBytes =
           fromHex(balancedHex)
 
+        console.log(
+          '[Midnight] Balanced TX bytes:',
+          balancedBytes.length,
+        )
+
         /**
          * Convert Lace transaction back into
          * Midnight FinalizedTransaction.
@@ -250,62 +420,9 @@ export function createWalletProviders(
 
         return finalizedTx
       } catch (err: any) {
-        /**
-         * IMPORTANT:
-         * We want the real Lace error here instead
-         * of only the generic Midnight wrapper error.
-         */
-        console.error(
-          '========== LACE BALANCE ERROR ==========',
-        )
-
-        console.error(
-          '[Lace ERROR] RAW:',
+        logLaceError(
+          'LACE BALANCE ERROR',
           err,
-        )
-
-        console.error(
-          '[Lace ERROR] NAME:',
-          err?.name,
-        )
-
-        console.error(
-          '[Lace ERROR] MESSAGE:',
-          err?.message,
-        )
-
-        console.error(
-          '[Lace ERROR] CODE:',
-          err?.code,
-        )
-
-        console.error(
-          '[Lace ERROR] REASON:',
-          err?.reason,
-        )
-
-        console.error(
-          '[Lace ERROR] TYPE:',
-          err?.type,
-        )
-
-        console.error(
-          '[Lace ERROR] DATA:',
-          err?.data,
-        )
-
-        console.error(
-          '[Lace ERROR] CAUSE:',
-          err?.cause,
-        )
-
-        console.error(
-          '[Lace ERROR] STACK:',
-          err?.stack,
-        )
-
-        console.error(
-          '========================================',
         )
 
         throw err
@@ -333,16 +450,31 @@ export function createWalletProviders(
           serializedTx.length,
         )
 
-        await api.submitTransaction(
-          serializedTx,
+        console.log(
+          '[Midnight] Calling Lace submitTransaction...',
         )
+
+        const submitResult =
+          await api.submitTransaction(
+            serializedTx,
+          )
 
         console.log(
           '[Midnight] ✅ Lace accepted transaction submission.',
         )
 
+        console.log(
+          '[Midnight] Lace submit response:',
+          submitResult,
+        )
+
         const identifiers =
           tx.identifiers()
+
+        console.log(
+          '[Midnight] Transaction identifiers:',
+          identifiers,
+        )
 
         const txId =
           identifiers[0]
@@ -354,58 +486,15 @@ export function createWalletProviders(
         }
 
         console.log(
-          '[Midnight] Transaction ID:',
+          '[Midnight] ✅ Transaction ID:',
           txId,
         )
 
         return txId
       } catch (err: any) {
-        console.error(
-          '========== LACE SUBMIT ERROR ==========',
-        )
-
-        console.error(
-          '[Lace ERROR] RAW:',
+        logLaceError(
+          'LACE SUBMIT ERROR',
           err,
-        )
-
-        console.error(
-          '[Lace ERROR] NAME:',
-          err?.name,
-        )
-
-        console.error(
-          '[Lace ERROR] MESSAGE:',
-          err?.message,
-        )
-
-        console.error(
-          '[Lace ERROR] CODE:',
-          err?.code,
-        )
-
-        console.error(
-          '[Lace ERROR] REASON:',
-          err?.reason,
-        )
-
-        console.error(
-          '[Lace ERROR] TYPE:',
-          err?.type,
-        )
-
-        console.error(
-          '[Lace ERROR] DATA:',
-          err?.data,
-        )
-
-        console.error(
-          '[Lace ERROR] CAUSE:',
-          err?.cause,
-        )
-
-        console.error(
-          '=======================================',
         )
 
         throw err

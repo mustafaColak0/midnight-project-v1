@@ -98,14 +98,6 @@ export async function createMidnightProviders(
   // SAFE BROWSER FETCH
   // --------------------------------------------------
 
-  /*
-   * window.fetch doğrudan başka bir provider'a
-   * geçirildiğinde "Illegal invocation" hatası
-   * alabiliyorduk.
-   *
-   * Bu yüzden Window'a bind ediyoruz.
-   */
-
   const browserFetch: typeof fetch =
     window.fetch.bind(window)
 
@@ -113,15 +105,6 @@ export async function createMidnightProviders(
   // --------------------------------------------------
   // ZK CONFIG
   // --------------------------------------------------
-
-  /*
-   * Vite public klasöründen:
-   *
-   * /keys/...
-   * /zkir/...
-   *
-   * dosyalarını okuyacak.
-   */
 
   const zkConfigProvider =
     new FetchZkConfigProvider<HelloWorldCircuitId>(
@@ -134,57 +117,60 @@ export async function createMidnightProviders(
   // PROOF PROVIDER
   // --------------------------------------------------
 
-  /*
-   * Browser doğrudan:
-   *
-   * https://proof-server.preprod.midnight.network
-   *
-   * adresine POST yaptığında CORS 403 alıyoruz.
-   *
-   * Bu yüzden request önce Vite'a gidiyor:
-   *
-   * localhost:5173/midnight-proof
-   *
-   * Vite proxy daha sonra Preprod proof server'a
-   * iletiyor.
-   */
-const proofServer = import.meta.env.PROD
-  ? `${window.location.origin}/midnight-proof`
-  : 'http://localhost:6300'
+const proofServer =
+  import.meta.env.VITE_PROOF_SERVER_URL ||
+  (import.meta.env.PROD
+    ? `${window.location.origin}/midnight-proof`
+    : 'http://localhost:6300')
 
-console.log(
-  '[Midnight] Proof server:',
-  proofServer,
-)
+  console.log(
+    '[Midnight] Proof server:',
+    proofServer,
+  )
 
-const proofProvider = httpClientProofProvider(
-  proofServer,
-  zkConfigProvider,
-)
+  const proofProvider =
+    httpClientProofProvider(
+      proofServer,
+      zkConfigProvider,
+    )
 
 
   // --------------------------------------------------
   // PUBLIC DATA PROVIDER
   // --------------------------------------------------
 
-  const publicDataProvider =
-    indexerPublicDataProvider(
-      configuration.indexerUri,
-      configuration.indexerWsUri,
-    )
+ const indexerHttp =
+  import.meta.env.VITE_INDEXER_HTTP_URL ||
+  'https://indexer.preprod.midnight.network/api/v3/graphql'
+
+const indexerWs =
+  import.meta.env.VITE_INDEXER_WS_URL ||
+  'wss://indexer.preprod.midnight.network/api/v3/graphql/ws'
+
+console.log('[Midnight] Indexer HTTP:', indexerHttp)
+console.log('[Midnight] Indexer WS:', indexerWs)
+
+const publicDataProvider = indexerPublicDataProvider(
+  indexerHttp,
+  indexerWs,
+)
 
 
   // --------------------------------------------------
   // PRIVATE STATE PROVIDER
   // --------------------------------------------------
 
-const privateStateProvider =
-  levelPrivateStateProvider({
-    midnightDbName: 'midnight-level2-v2',
-    accountId: unshieldedAddress,
-    privateStoragePasswordProvider:
-      getPrivateStatePassword,
-  })
+  const privateStateProvider =
+    levelPrivateStateProvider({
+      midnightDbName:
+        'midnight-level2-v2',
+
+      accountId:
+        unshieldedAddress,
+
+      privateStoragePasswordProvider:
+        getPrivateStatePassword,
+    })
 
 
   // --------------------------------------------------
