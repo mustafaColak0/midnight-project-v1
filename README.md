@@ -11,7 +11,7 @@ The project demonstrates a frontend application connected to a deployed Compact 
 ## 🌐 Live Demo
 
 **Live Application:**  
-[[ADD YOUR VERCEL / NETLIFY URL HERE]](https://midnight-privacy-voting.vercel.app/)
+[Midnight Privacy Voting](https://midnight-privacy-voting.vercel.app/)
 
 > The application is configured for the Midnight **Preprod** network.
 
