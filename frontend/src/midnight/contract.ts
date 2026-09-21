@@ -1,6 +1,6 @@
 import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js'
 import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts'
-
+import { validateSecretValue } from "./eligibility";
 import * as HelloWorld from '../generated/hello-world/index.js'
 
 import type { MidnightProviders } from '@midnight-ntwrk/midnight-js-types'
@@ -80,11 +80,7 @@ export async function provePrivateThreshold(
   providers: MidnightProviders<HelloWorldCircuitId>,
   secretValue: bigint,
 ) {
-  if (secretValue < 0n || secretValue > 65535n) {
-    throw new Error(
-      'Secret value must be between 0 and 65535.',
-    )
-  }
+  validateSecretValue(secretValue);
 
   const contract =
     await findHelloWorldContract(providers)
