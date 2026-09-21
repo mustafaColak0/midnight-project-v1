@@ -404,7 +404,7 @@ export default function App() {
                 </h1>
 
                 <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                  Level 1 • ZK Proofs
+                  • ZK Proofs
                 </span>
               </div>
 
