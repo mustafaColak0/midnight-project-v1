@@ -461,7 +461,7 @@ The demonstration video shows:
    <img width="1220" height="707" alt="wallet-connected-preprod" src="https://github.com/user-attachments/assets/5d0304ea-ea69-4d21-919c-4493590a7891" />
 
 4. Successful Zero-Knowledge Proof on Preprod
-   <img width="1915" height="887" alt="zk-proof-success-preprod" src="https://github.com/user-attachments/assets/2797751a-6ee2-4867-bd72-fc47bb228db7" />
+   <img width="1917" height="877" alt="zk-proof-success-preprod" src="https://github.com/user-attachments/assets/f4030917-3ce6-4718-8448-cc67be359372" />
 
 5. Successful Preprod Transaction — Midnight Explorer
   <img width="1917" height="900" alt="midnight-preprod-successful-transaction" src="https://github.com/user-attachments/assets/3677604f-bca7-437b-a674-6a6f9b0f7a8d" />
