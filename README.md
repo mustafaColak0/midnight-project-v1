@@ -228,7 +228,7 @@ A successful Zero-Knowledge circuit execution was submitted to Midnight Preprod 
 Example transaction identifier:
 
 ```text
-00917400e43535d9df6a79b65f91df67412ca3dd93cb82e8ff327e9b3b3c353525
+00da1669c44d65cecc13d3559a8e2dd3e526551f17c7ffe8efc9f0b55016709db1
 ```
 
 The transaction was:
@@ -458,7 +458,8 @@ The demonstration video shows:
    <img width="1168" height="621" alt="midnight-success" src="https://github.com/user-attachments/assets/11a6d3eb-3f01-4a15-b930-800be09ab8b9" />
 
 3. Midnight Wallet Connected on Preprod
-   <img width="1220" height="707" alt="wallet-connected-preprod" src="https://github.com/user-attachments/assets/5d0304ea-ea69-4d21-919c-4493590a7891" />
+   <img width="1217" height="701" alt="wallet-connected-preprod" src="https://github.com/user-attachments/assets/c3df6ba7-cabe-47b4-8e2c-fcdaff75ab4f" />
+
 
 4. Successful Zero-Knowledge Proof on Preprod
    <img width="1917" height="877" alt="zk-proof-success-preprod" src="https://github.com/user-attachments/assets/f4030917-3ce6-4718-8448-cc67be359372" />
