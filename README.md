@@ -1,8 +1,12 @@
-# 🌒 Midnight Level 2 — Waxing Crescent
+# 🌓 Midnight Level 3 — First Quarter
 
-## Privacy-Preserving Zero-Knowledge DApp
+## Private Eligibility Gate — Privacy-Preserving Zero-Knowledge DApp
 
-This repository contains my **Level 2 — Waxing Crescent** submission for the Midnight Network development track.
+This repository contains my **Level 3 — First Quarter** submission for the Midnight Network development track.
+
+The project demonstrates a production-oriented privacy-preserving eligibility verification DApp built with Midnight. A user can prove that a private value satisfies an eligibility threshold without intentionally revealing the underlying value on the public ledger.
+
+The Level 3 implementation extends the previous Preprod DApp with automated testing, CI/CD, an explicit privacy model, and a real-world **Private Eligibility Gate** use case.
 
 The project demonstrates a frontend application connected to a deployed Compact smart contract on **Midnight Preprod**, wallet integration through the **Midnight DApp Connector API**, and a successful Zero-Knowledge circuit execution where a private value can be verified without revealing the value itself on the public ledger.
 
@@ -459,19 +463,10 @@ The demonstration video shows:
 
 3. Midnight Wallet Connected on Preprod
    <img width="1217" height="701" alt="wallet-connected-preprod" src="https://github.com/user-attachments/assets/c3df6ba7-cabe-47b4-8e2c-fcdaff75ab4f" />
-<<<<<<< HEAD
-
-4. Successful Zero-Knowledge Proof on Preprod
-   <img width="1917" height="877" alt="zk-proof-success-preprod" src="https://github.com/user-attachments/assets/f4030917-3ce6-4718-8448-cc67be359372" />
-=======
 
 
 4. Successful Zero-Knowledge Proof on Preprod
    <img width="1917" height="877" alt="zk-proof-success-preprod" src="https://github.com/user-attachments/assets/f4030917-3ce6-4718-8448-cc67be359372" />
-
-5. Successful Preprod Transaction — Midnight Explorer
-  <img width="1917" height="900" alt="midnight-preprod-successful-transaction" src="https://github.com/user-attachments/assets/3677604f-bca7-437b-a674-6a6f9b0f7a8d" />
->>>>>>> 6c42f51c0374e32f3c039bb310b747ab3effbef5
 
 5. Successful Preprod Transaction — Midnight Explorer
    <img width="1917" height="900" alt="midnight-preprod-successful-transaction" src="https://github.com/user-attachments/assets/3677604f-bca7-437b-a674-6a6f9b0f7a8d" />
