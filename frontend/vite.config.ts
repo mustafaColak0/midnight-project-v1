@@ -17,10 +17,10 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      /*
-       * Midnight dependency'lerinden biri Node EventEmitter kullanıyor.
-       * Vite'ın "events" modülünü externalize etmesini engelliyoruz.
-       */
+      /**
+ * One of the Midnight dependencies relies on Node's EventEmitter.
+ * This alias prevents Vite from externalizing the "events" module.
+ */
       events: require.resolve('events/'),
     },
 

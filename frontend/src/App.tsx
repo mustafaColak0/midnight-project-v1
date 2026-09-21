@@ -54,21 +54,18 @@ export default function App() {
 
   const [connectedWalletName, setConnectedWalletName] = useState<string>("");
 
-  // Connected API React state yerine ref'te tutuluyor.
+  // In the Connected API, it is stored in a ref rather than in React state.
   const walletApiRef = useRef<WalletConnectedAPI | null>(null);
 
   /**
-   * window.midnight altında enjekte edilmiş bütün
-   * Connector API uyumlu Midnight wallet'ları bulur.
-   *
-   * Lace'e özel değildir.
-   * 1AM veya başka bir uyumlu wallet da burada görünür.
+   * The wallet extension may inject its provider a few hundred
+   * milliseconds after the initial React render.
    */
   const detectWallets = (): WalletOption[] => {
     const injected = (window as any).midnight;
 
     if (!injected) {
-      console.warn("[Wallet] window.midnight bulunamadı.");
+      console.warn("[Wallet] window.midnight was not detected.");
 
       setAvailableWallets([]);
       setSelectedWalletId("");
@@ -109,9 +106,9 @@ export default function App() {
     setAvailableWallets(detected);
 
     /*
-     * Tek wallet varsa otomatik seç.
+     * If there is only one wallet, select it automatically.
      *
-     * Birden fazla wallet varsa kullanıcı seçim yapacak.
+     * If there are multiple wallets, the user will make the selection.
      */
     if (detected.length === 1) {
       setSelectedWalletId(detected[0].id);
@@ -126,11 +123,11 @@ export default function App() {
   };
 
   /**
-   * Sayfa açıldığında wallet extension'larını tara.
+   * Detect available Midnight wallet extensions when the application loads.
    *
-   * Bazı extension'lar window.midnight nesnesini
-   * React render'ından birkaç yüz ms sonra inject edebildiği
-   * için kısa tekrar taramaları da yapıyoruz.
+   * Some wallet extensions inject the window.midnight provider shortly after
+   * the initial React render, so additional detection attempts are scheduled
+   * to ensure late-injected providers are discovered.
    */
   useEffect(() => {
     detectWallets();
@@ -162,19 +159,20 @@ export default function App() {
 
       if (!injected) {
         throw new Error(
-          "Midnight wallet API bulunamadı. Lace veya 1AM extension açık mı?",
+          "Midnight wallet API was not detected. Ensure that the Lace or 1AM extension is installed, enabled, and unlocked.",
         );
       }
 
       /*
-       * Her connect denemesinde yeniden tarıyoruz.
-       * Böylece extension sonradan açılmışsa da yakalanır.
+       * Re-scan for available wallets before each connection attempt.
+       * This ensures that wallet extensions initialized after the initial
+       * page load can still be detected.
        */
       const wallets = detectWallets();
 
       if (wallets.length === 0) {
         throw new Error(
-          "Uyumlu Midnight wallet bulunamadı. Lace veya 1AM extension'ını kontrol et.",
+          "No compatible Midnight wallet was detected. Ensure that the Lace or 1AM extension is installed, enabled, and unlocked.",
         );
       }
 
@@ -183,7 +181,8 @@ export default function App() {
       );
 
       /*
-       * Tek wallet varsa kullanıcı seçim yapmadan bağlanabilsin.
+       * Automatically select the wallet when only one compatible
+       * Midnight wallet is available.
        */
       if (!selectedWallet && wallets.length === 1) {
         selectedWallet = wallets[0];
@@ -193,7 +192,7 @@ export default function App() {
 
       if (!selectedWallet) {
         throw new Error(
-          "Birden fazla Midnight wallet bulundu. Önce bağlanmak istediğin wallet'ı seç.",
+          "Multiple Midnight wallets were detected. Select the wallet you want to connect.",
         );
       }
 
@@ -224,7 +223,7 @@ export default function App() {
 
       if (connectionStatus.networkId?.toLowerCase() !== "preprod") {
         throw new Error(
-          `${selectedWallet.name} Preprod ağına bağlı olmalı. ` +
+          `${selectedWallet.name} must be connected to the Preprod network. ` +
             `Current network: ${connectionStatus.networkId}`,
         );
       }
@@ -237,7 +236,7 @@ export default function App() {
 
       if (configuration.networkId?.toLowerCase() !== "preprod") {
         throw new Error(
-          `${selectedWallet.name} Preprod kullanmalı. ` +
+          `${selectedWallet.name} must be configured for the Preprod network. ` +
             `Current network: ${configuration.networkId}`,
         );
       }
@@ -249,8 +248,8 @@ export default function App() {
       console.log("[Wallet] ✅ ADDRESS:", unshieldedAddress);
 
       /*
-       * Midnight providers bundan sonra hangi wallet seçildiyse
-       * onun ConnectedAPI nesnesini kullanacak.
+       * Use the Connected API instance of the selected wallet
+       * for all subsequent Midnight provider operations.
        */
       walletApiRef.current = connectedApi;
 
@@ -290,7 +289,9 @@ export default function App() {
       localStorage.removeItem("midnight_wallet_name");
 
       setError(
-        err?.reason || err?.message || "Midnight wallet bağlantısı başarısız.",
+        err?.reason ||
+          err?.message ||
+          "Failed to connect to the Midnight wallet.",
       );
     } finally {
       setLoading(false);
@@ -321,7 +322,7 @@ export default function App() {
 
     if (wallets.length === 0) {
       setError(
-        "Midnight wallet bulunamadı. Lace veya 1AM extension'ının açık olduğundan emin ol.",
+        "No Midnight wallet was detected. Ensure that the Lace or 1AM extension is installed, enabled, and unlocked.",
       );
     }
   };
@@ -330,7 +331,9 @@ export default function App() {
     const walletApi = walletApiRef.current;
 
     if (!walletApi) {
-      setError("Önce Lace veya 1AM Midnight wallet bağlantısını kurmalısın.");
+      setError(
+        "Connect a Lace or 1AM Midnight wallet before generating a proof.",
+      );
       return;
     }
 
@@ -341,7 +344,7 @@ export default function App() {
       parsedValue < 0 ||
       parsedValue > 65535
     ) {
-      setError("Secret value 0 ile 65535 arasında bir tam sayı olmalı.");
+      setError("The secret value must be an integer between 0 and 65535.");
       return;
     }
 
