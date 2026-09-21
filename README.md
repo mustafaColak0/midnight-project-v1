@@ -15,7 +15,7 @@ The project demonstrates a frontend application connected to a deployed Compact 
 ## 🌐 Live Demo
 
 **Live Application:**  
-[Midnight Privacy Voting](https://midnight-privacy-voting.vercel.app/)
+[Midnight Private Eligibility Gate](https://midnight-privacy-voting.vercel.app/)
 
 > The application is configured for the Midnight **Preprod** network.
 
@@ -35,39 +35,54 @@ The frontend connects to this deployed Compact contract and calls its circuit us
 
 ---
 
-## 💡 Project Idea
+## 💡 Project Idea — Private Eligibility Gate
 
-The long-term goal of this project is to build a **privacy-preserving voting system** on Midnight.
+The Level 3 product idea is a **Private Eligibility Gate** built on Midnight.
 
-Traditional voting applications may expose information that can be associated with individual users. Midnight's Zero-Knowledge architecture makes it possible to verify statements about private information without publishing the underlying information itself.
+Many applications need to determine whether a user satisfies an eligibility requirement without needing to know the user's exact private value. Examples include age-gated services, membership requirements, access-control systems, and privacy-preserving qualification checks.
 
-In the current Level 2 implementation, the application demonstrates this principle with a private threshold proof.
-
-A user provides a secret value locally and the Compact circuit verifies whether:
+In this DApp, the user provides a private value locally and the Compact circuit verifies whether:
 
 ```text
 secretValue >= 18
 ```
 
-The private value itself is not displayed on the public ledger.
+The underlying secretValue is not intentionally published as public contract state.
 
-Only the result of the proof becomes observable:
+Instead, the application exposes the successful verification result:
 
-```text
 thresholdProofVerified = true
-```
 
-This provides the privacy primitive that can later be extended into private voting logic.
+This allows the DApp to answer the question:
+
+"Does the user satisfy the required eligibility threshold?"
+
+without requiring the application to publicly disclose the exact private value used to produce the proof.
+
+Product Goal
+
+The goal is to demonstrate how Midnight Zero-Knowledge technology can support real-world eligibility verification while minimizing unnecessary disclosure of private information.
 
 ---
 
-## 🔐 Privacy Claim
+## 🔐 Level 3 Privacy Model
 
-The main privacy behavior demonstrated by this DApp is:
+The privacy model of the Private Eligibility Gate separates the user's private input from the information intentionally exposed through the application's public contract state.
 
-> A user can prove that a private value satisfies a condition without revealing the original value on-chain.
+### What an Observer CAN Learn
 
-For example, if the user enters:
+An observer can learn:
+
+- That an eligibility proof was successfully submitted.
+- That the required eligibility condition was satisfied.
+- The public verification result: `thresholdProofVerified = true`.
+- Public transaction metadata and contract information exposed by Midnight Preprod.
+
+### What an Observer CANNOT Learn From the Application's Intended Public State
+
+An observer cannot learn the exact private `secretValue` merely from the application's intended public contract state.
+
+For example, if a user provides:
 
 ```text
 25
@@ -76,7 +91,7 @@ For example, if the user enters:
 the circuit proves:
 
 ```text
-25 >= 18
+secretValue >= 18
 ```
 
 without publishing `25` as public contract state.
@@ -87,20 +102,22 @@ The observable result is:
 thresholdProofVerified = true
 ```
 
+without intentionally publishing 25 as public contract state.
+
+The privacy boundary is:
+
 Therefore:
 
 ```text
-Private Input
-     │
-     ▼
-Compact Circuit
-     │
-     ▼
-Zero-Knowledge Proof
-     │
-     ├── Secret value remains private
-     │
-     └── Verification result becomes observable
+Private secret value
+        │
+        ▼
+Compact Zero-Knowledge Circuit
+        │
+        ├── Exact value remains private
+        │
+        ▼
+Public eligibility result
 ```
 
 This demonstrates the separation between **private witness data** and **publicly verifiable state** provided by Midnight.
@@ -255,7 +272,7 @@ Verified on Preprod
 
 ## 🖥️ Frontend Features
 
-The Level 2 frontend includes:
+The Level 3 frontend includes:
 
 - Midnight-compatible wallet discovery
 - Lace wallet connection
@@ -271,7 +288,11 @@ The Level 2 frontend includes:
 - Transaction submission
 - Public verification result
 - Privacy status visualization
-
+- Private Eligibility Gate validation
+- Eligibility threshold verification
+- Automated Vitest test suite
+- GitHub Actions CI/CD
+- Automated production build validation
 ---
 
 ## 🛠️ Technology Stack
@@ -316,6 +337,8 @@ midnight-project-v1/
 │   │   │
 │   │   ├── midnight/
 │   │   │   ├── contract.ts
+│   │   │   ├── eligibility.ts
+│   │   │   ├── eligibility.test.ts
 │   │   │   ├── providers.ts
 │   │   │   └── walletAdapter.ts
 │   │   │
@@ -328,6 +351,10 @@ midnight-project-v1/
 │   └── Compact contract source
 │
 └── README.md
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yaml
 ```
 
 > The exact generated files may vary depending on the Compact compiler version.
@@ -433,27 +460,108 @@ Wallet private keys and recovery phrases are never requested by the DApp.
 
 ---
 
-## 🎥 Level 2 Demo
+## 🧪 Automated Tests
 
-The demonstration video shows:
+Level 3 introduces an automated test suite using **Vitest**.
 
-1. The frontend running with the deployed Preprod contract
-2. Lace detected by the DApp
-3. Lace connected to Midnight Preprod
-4. Lace disconnected from the frontend
-5. A Midnight-compatible transaction wallet connected
-6. A private secret value entered locally
-7. `Generate Private Proof` executed
-8. The Compact circuit called from the frontend
-9. The transaction submitted to Midnight Preprod
-10. `thresholdProofVerified = true`
-11. The private value remaining undisclosed
+The eligibility test suite validates the application's private-value boundaries and eligibility threshold behavior.
 
-## 🎥 Demo Video
+Current result:
+
+```text
+Test Files  1 passed (1)
+Tests       7 passed (7)
+```
+
+The test suite covers:
+
+- Minimum supported private value (`0`)
+- Maximum supported private value (`65535`)
+- Rejection of values below the supported range
+- Rejection of values above the supported range
+- A value below the eligibility threshold (`17`)
+- The exact eligibility threshold (`18`)
+- A value above the eligibility threshold
+
+Tests can be executed with:
+
+```bash
+cd frontend
+npm test
+```
+
+### 📸 Test Evidence
+
+<img width="745" height="442" alt="Midnight-Level-3-Eligibility-Gate-7-Tests-Passing" src="https://github.com/user-attachments/assets/cc121cc6-148e-4517-be23-fce9ff4ad520" />
+
+**7/7 automated tests passing.**
+
+---
+
+## ⚙️ CI/CD
+
+The repository uses **GitHub Actions** to automatically validate the frontend on pushes and pull requests targeting the `main` branch.
+
+The CI workflow performs:
+
+```text
+Checkout repository
+        ↓
+Setup Node.js
+        ↓
+Install dependencies
+        ↓
+Run automated tests
+        ↓
+Build production application
+```
+
+The pipeline executes:
+
+```bash
+npm ci
+npm test
+npm run build
+```
+
+A successful CI run confirms that both the automated eligibility test suite and the production frontend build complete successfully.
+
+**Workflow:**
+
+```text
+.github/workflows/ci.yaml
+```
+
+### 📸 CI/CD Evidence
+
+<img width="1882" height="597" alt="Midnight-Level-3-CI-Passing" src="https://github.com/user-attachments/assets/2fdbd0a4-29cd-43d0-a51a-656816a20e90" />
+
+**GitHub Actions — Test and Build succeeded.**
+
+---
+
+## 🎥 Level 3 Demo
+
+The Level 3 demonstration will show the complete Private Eligibility Gate flow:
+
+1. Open the Level 3 DApp.
+2. Detect and connect a Midnight-compatible wallet on Preprod.
+3. Display the deployed Preprod contract.
+4. Enter a private eligibility value locally.
+5. Execute `Generate Private Proof`.
+6. Call the deployed Compact `proveThreshold` circuit.
+7. Generate the Zero-Knowledge proof.
+8. Submit the transaction.
+9. Display `thresholdProofVerified = true`.
+10. Demonstrate that the underlying private value is not intentionally published as public contract state.
+11. Show the automated test suite passing.
+12. Show the GitHub Actions CI workflow passing.
+
+### Level 2 Demo Video
 
 [Watch the Level 2 Demo Video](https://drive.google.com/file/d/107qt5FiF_Hee7QwmN7Yv5GzWbD1t2SiS/view)
 
-📸 Proof of Completion (Screenshots)
+## 📸 Previous Level 2 Evidence
 
 1. Successful Compilation Output (Circuits Generated)
    <img width="750" height="307" alt="build-circuits" src="https://github.com/user-attachments/assets/341f7e84-187d-4205-a478-0cb4aa5880ab" />
@@ -473,22 +581,57 @@ The demonstration video shows:
 
 ---
 
-## 📋 Level 2 Requirements
+## 📸 Level 3 Proof of Completion
 
-| Requirement                       | Implementation      |
-| --------------------------------- | ------------------- |
-| Contract wired to frontend UI     | ✅ Implemented      |
-| Lace wallet connection on Preprod | ✅ Implemented      |
-| Lace wallet disconnection         | ✅ Implemented      |
-| Circuit called from frontend      | ✅ Implemented      |
-| Observable privacy behavior       | ✅ Implemented      |
-| Contract deployed to Preprod      | ✅ Implemented      |
-| Verifiable contract address       | ✅ Included         |
-| Public GitHub repository          | ✅ Repository       |
-| README privacy documentation      | ✅ Included         |
-| Live demo                         | 🔗 See Live Demo    |
-| Demo video                        | 🔗 See Level 2 Demo |
-| Minimum 8 meaningful commits      | ✅ See Git history  |
+### 1. Automated Test Suite — 7 Tests Passing
+
+<img width="745" height="442" alt="Midnight-Level-3-Eligibility-Gate-7-Tests-Passing" src="https://github.com/user-attachments/assets/e3f1d041-413d-492f-b5ab-8bb3832354bf" />
+
+
+> Screenshot: `Midnight-Level-3-Eligibility-Gate-7-Tests-Passing.png`
+
+### 2. GitHub Actions — Test and Build Passing
+
+<img width="1882" height="597" alt="Midnight-Level-3-CI-Passing" src="https://github.com/user-attachments/assets/6c0a5721-a7cd-48ee-a3c5-3777cc425463" />
+
+
+> Screenshot: `Midnight-Level-3-CI-Passing.png`
+
+### 3. Private Eligibility Proof on Preprod
+
+<!-- LEVEL-3-ELIGIBILITY-PROOF-SCREENSHOT -->
+
+> Final Level 3 eligibility proof screenshot will be added here.
+
+### 4. Successful Level 3 Preprod Transaction
+
+<!-- LEVEL-3-PREPROD-TRANSACTION-SCREENSHOT -->
+
+> Final Level 3 Preprod transaction screenshot will be added here.
+
+---
+
+## 📋 Level 3 Requirements
+
+| Requirement | Implementation |
+| --- | --- |
+| Functional privacy-preserving DApp | ✅ Implemented |
+| Private Eligibility Gate use case | ✅ Implemented |
+| Deployed Compact contract on Preprod | ✅ Implemented |
+| Wallet integration | ✅ Implemented |
+| Zero-Knowledge circuit execution | ✅ Implemented |
+| Minimum 3 automated tests | ✅ 7 tests passing |
+| Automated CI/CD pipeline | ✅ GitHub Actions |
+| Production build validation | ✅ Passing |
+| Explicit privacy model | ✅ Documented |
+| Observer CAN / CANNOT learn analysis | ✅ Documented |
+| Public GitHub repository | ✅ Available |
+| Live frontend deployment | ✅ Available |
+| Level 3 test evidence | ✅ Captured |
+| Passing CI evidence | ✅ Captured |
+| Level 3 demo video | ⏳ To be added |
+| Product proposal | ⏳ Submission / approval step |
+| Minimum 10 meaningful commits | ✅ See Git history |
 
 ---
 
@@ -505,31 +648,33 @@ The application:
 
 ---
 
-## 🌒 Level 2 — Waxing Crescent
+## 🌓 Level 3 — First Quarter
 
-This project advances the original Level 1 Compact contract into a functional Midnight DApp.
+Level 3 evolves the previous Midnight DApp into a more production-oriented **Private Eligibility Gate**.
 
-Level 1 established the contract and initial privacy architecture.
+The previous implementation established wallet connectivity, Midnight.js providers, Preprod contract interaction, and Zero-Knowledge proof execution.
 
-Level 2 adds:
+Level 3 adds:
 
 ```text
-Compact Contract
-       +
-React Frontend
-       +
-Midnight.js
-       +
-DApp Connector
-       +
-Preprod Wallet
-       +
-Zero-Knowledge Circuit Execution
-       =
-Functional Midnight DApp
+Private Eligibility Gate
+        +
+Zero-Knowledge Threshold Proof
+        +
+Input Validation
+        +
+7 Automated Tests
+        +
+GitHub Actions CI/CD
+        +
+Production Build Validation
+        +
+Explicit Privacy Model
+        =
+Level 3 Production-Oriented Midnight DApp
 ```
 
-The result is a working frontend capable of interacting with a deployed Compact contract while demonstrating an observable privacy-preserving behavior.
+The result is a privacy-preserving application that demonstrates how an eligibility condition can be verified without intentionally exposing the underlying private value as public application state.
 
 ---
 
