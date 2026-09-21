@@ -445,9 +445,9 @@ The demonstration video shows:
 10. `thresholdProofVerified = true`
 11. The private value remaining undisclosed
 
-**Demo Video:**
+## 🎥 Demo Video
 
-Video linki :
+[Watch the Level 2 Demo Video](https://drive.google.com/file/d/107qt5FiF_Hee7QwmN7Yv5GzWbD1t2SiS/view)
 
 📸 Proof of Completion (Screenshots)
 
@@ -462,6 +462,9 @@ Video linki :
 
 4. Successful Zero-Knowledge Proof on Preprod
    <img width="1915" height="887" alt="zk-proof-success-preprod" src="https://github.com/user-attachments/assets/2797751a-6ee2-4867-bd72-fc47bb228db7" />
+
+5. Successful Preprod Transaction — Midnight Explorer
+  <img width="1917" height="900" alt="midnight-preprod-successful-transaction" src="https://github.com/user-attachments/assets/3677604f-bca7-437b-a674-6a6f9b0f7a8d" />
 
 
 ---
