@@ -11,7 +11,7 @@ The project demonstrates a frontend application connected to a deployed Compact 
 ## 🌐 Live Demo
 
 **Live Application:**  
-[ADD YOUR VERCEL / NETLIFY URL HERE]
+[[ADD YOUR VERCEL / NETLIFY URL HERE]](https://midnight-privacy-voting.vercel.app/)
 
 > The application is configured for the Midnight **Preprod** network.
 
@@ -458,14 +458,11 @@ Video linki :
    <img width="1168" height="621" alt="midnight-success" src="https://github.com/user-attachments/assets/11a6d3eb-3f01-4a15-b930-800be09ab8b9" />
 
 3. Midnight Wallet Connected on Preprod
-
-   <!-- Buraya yeni 1AM bağlı ekran görüntüsünü yükle -->
-   <!-- CONNECTED WALLET: 1AM + PREPROD contract görünen ekran -->
+   <img width="1220" height="707" alt="wallet-connected-preprod" src="https://github.com/user-attachments/assets/5d0304ea-ea69-4d21-919c-4493590a7891" />
 
 4. Successful Zero-Knowledge Proof on Preprod
+   <img width="1915" height="887" alt="zk-proof-success-preprod" src="https://github.com/user-attachments/assets/2797751a-6ee2-4867-bd72-fc47bb228db7" />
 
-   <!-- Buraya az önceki YEŞİL SUCCESS ekran görüntüsünü yükle -->
-   <!-- "Private threshold proof verified on Preprod" görünen ekran -->
 
 ---
 
