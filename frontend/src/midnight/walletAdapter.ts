@@ -44,19 +44,19 @@ function fromHex(hex: string): Uint8Array {
 
   if (cleanHex.length === 0) {
     throw new Error(
-      'Lace returned an empty transaction.',
+      'Wallet returned an empty transaction.',
     )
   }
 
   if (cleanHex.length % 2 !== 0) {
     throw new Error(
-      'Invalid transaction hex returned by Lace.',
+      'Invalid transaction hex returned by wallet.',
     )
   }
 
   if (!/^[0-9a-fA-F]+$/.test(cleanHex)) {
     throw new Error(
-      'Lace returned non-hex transaction data.',
+      'Wallet returned non-hex transaction data.',
     )
   }
 
@@ -79,10 +79,10 @@ function fromHex(hex: string): Uint8Array {
 }
 
 /**
- * Lace / Effect FiberFailure içindeki gerçek hatayı
+ * Wallet / Effect FiberFailure içindeki gerçek hatayı
  * mümkün olduğunca derin şekilde loglar.
  */
-function logLaceError(
+function logWalletError(
   title: string,
   err: any,
 ): void {
@@ -91,47 +91,47 @@ function logLaceError(
   )
 
   console.error(
-    '[Lace ERROR] RAW:',
+    '[Wallet ERROR] RAW:',
     err,
   )
 
   console.error(
-    '[Lace ERROR] NAME:',
+    '[Wallet ERROR] NAME:',
     err?.name,
   )
 
   console.error(
-    '[Lace ERROR] MESSAGE:',
+    '[Wallet ERROR] MESSAGE:',
     err?.message,
   )
 
   console.error(
-    '[Lace ERROR] CODE:',
+    '[Wallet ERROR] CODE:',
     err?.code,
   )
 
   console.error(
-    '[Lace ERROR] REASON:',
+    '[Wallet ERROR] REASON:',
     err?.reason,
   )
 
   console.error(
-    '[Lace ERROR] TYPE:',
+    '[Wallet ERROR] TYPE:',
     err?.type,
   )
 
   console.error(
-    '[Lace ERROR] DATA:',
+    '[Wallet ERROR] DATA:',
     err?.data,
   )
 
   console.error(
-    '[Lace ERROR] CAUSE:',
+    '[Wallet ERROR] CAUSE:',
     err?.cause,
   )
 
   console.error(
-    '[Lace ERROR] STACK:',
+    '[Wallet ERROR] STACK:',
     err?.stack,
   )
 
@@ -139,24 +139,24 @@ function logLaceError(
   const failure = cause?.failure
 
   console.log(
-    '[Lace ERROR] CAUSE OBJECT:',
+    '[Wallet ERROR] CAUSE OBJECT:',
     cause,
   )
 
   console.log(
-    '[Lace ERROR] CAUSE KEYS:',
+    '[Wallet ERROR] CAUSE KEYS:',
     cause && typeof cause === 'object'
       ? Object.keys(cause)
       : [],
   )
 
   console.log(
-    '[Lace ERROR] FAILURE OBJECT:',
+    '[Wallet ERROR] FAILURE OBJECT:',
     failure,
   )
 
   console.log(
-    '[Lace ERROR] FAILURE KEYS:',
+    '[Wallet ERROR] FAILURE KEYS:',
     failure && typeof failure === 'object'
       ? Object.keys(failure)
       : [],
@@ -170,34 +170,34 @@ function logLaceError(
       const key of Object.keys(failure)
     ) {
       console.log(
-        `[Lace ERROR] failure.${key}:`,
+        `[Wallet ERROR] failure.${key}:`,
         failure[key],
       )
     }
   }
 
   console.log(
-    '[Lace ERROR] FAILURE MESSAGE:',
+    '[Wallet ERROR] FAILURE MESSAGE:',
     failure?.message,
   )
 
   console.log(
-    '[Lace ERROR] FAILURE CODE:',
+    '[Wallet ERROR] FAILURE CODE:',
     failure?.code,
   )
 
   console.log(
-    '[Lace ERROR] FAILURE REASON:',
+    '[Wallet ERROR] FAILURE REASON:',
     failure?.reason,
   )
 
   console.log(
-    '[Lace ERROR] FAILURE DATA:',
+    '[Wallet ERROR] FAILURE DATA:',
     failure?.data,
   )
 
   console.log(
-    '[Lace ERROR] FAILURE CAUSE:',
+    '[Wallet ERROR] FAILURE CAUSE:',
     failure?.cause,
   )
 
@@ -223,12 +223,12 @@ function logLaceError(
     )
 
     console.log(
-      '[Lace ERROR] FAILURE JSON:',
+      '[Wallet ERROR] FAILURE JSON:',
       json,
     )
   } catch (jsonError) {
     console.log(
-      '[Lace ERROR] FAILURE JSON stringify failed:',
+      '[Wallet ERROR] FAILURE JSON stringify failed:',
       jsonError,
     )
   }
@@ -268,7 +268,7 @@ export function createWalletProviders(
       _ttl?: Date,
     ): Promise<FinalizedTransaction> {
       console.log(
-        '[Midnight] Balancing transaction with Lace...',
+        '[Midnight] Balancing transaction with wallet...',
       )
 
       try {
@@ -280,12 +280,12 @@ export function createWalletProviders(
             await api.getDustBalance()
 
           console.log(
-            '[Lace DEBUG] DUST balance:',
+            '[Wallet DEBUG] DUST balance:',
             dustBalance,
           )
         } catch (balanceError) {
           console.warn(
-            '[Lace DEBUG] Could not read DUST balance:',
+            '[Wallet DEBUG] Could not read DUST balance:',
             balanceError,
           )
         }
@@ -298,12 +298,12 @@ export function createWalletProviders(
             await api.getUnshieldedBalances()
 
           console.log(
-            '[Lace DEBUG] Unshielded balances:',
+            '[Wallet DEBUG] Unshielded balances:',
             unshieldedBalances,
           )
         } catch (balanceError) {
           console.warn(
-            '[Lace DEBUG] Could not read unshielded balances:',
+            '[Wallet DEBUG] Could not read unshielded balances:',
             balanceError,
           )
         }
@@ -316,12 +316,12 @@ export function createWalletProviders(
             await api.getShieldedBalances()
 
           console.log(
-            '[Lace DEBUG] Shielded balances:',
+            '[Wallet DEBUG] Shielded balances:',
             shieldedBalances,
           )
         } catch (balanceError) {
           console.warn(
-            '[Lace DEBUG] Could not read shielded balances:',
+            '[Wallet DEBUG] Could not read shielded balances:',
             balanceError,
           )
         }
@@ -338,11 +338,11 @@ export function createWalletProviders(
         )
 
         console.log(
-          '[Midnight] Calling Lace balanceUnsealedTransaction...',
+          '[Midnight] Calling wallet balanceUnsealedTransaction...',
         )
 
         /**
-         * Lace transaction balancing.
+         * Wallet transaction balancing.
          */
         const balanced =
           await api.balanceUnsealedTransaction(
@@ -350,11 +350,11 @@ export function createWalletProviders(
           )
 
         console.log(
-          '[Midnight] ✅ Lace balance response received.',
+          '[Midnight] ✅ Wallet balance response received.',
         )
 
         console.log(
-          '[Midnight] Raw Lace balance response:',
+          '[Midnight] Raw wallet balance response:',
           balanced,
         )
 
@@ -376,12 +376,12 @@ export function createWalletProviders(
           balancedHex.length === 0
         ) {
           console.error(
-            '[Midnight] Invalid Lace balance response:',
+            '[Midnight] Invalid wallet balance response:',
             balanced,
           )
 
           throw new Error(
-            'Lace did not return a valid balanced transaction.',
+            'Wallet did not return a valid balanced transaction.',
           )
         }
 
@@ -399,7 +399,7 @@ export function createWalletProviders(
         )
 
         /**
-         * Convert Lace transaction back into
+         * Convert wallet transaction back into
          * Midnight FinalizedTransaction.
          */
         const finalizedTx =
@@ -420,8 +420,8 @@ export function createWalletProviders(
 
         return finalizedTx
       } catch (err: any) {
-        logLaceError(
-          'LACE BALANCE ERROR',
+        logWalletError(
+          'WALLET BALANCE ERROR',
           err,
         )
 
@@ -438,7 +438,7 @@ export function createWalletProviders(
       tx: FinalizedTransaction,
     ): Promise<TransactionId> {
       console.log(
-        '[Midnight] Submitting transaction with Lace...',
+        '[Midnight] Submitting transaction with wallet...',
       )
 
       try {
@@ -451,7 +451,7 @@ export function createWalletProviders(
         )
 
         console.log(
-          '[Midnight] Calling Lace submitTransaction...',
+          '[Midnight] Calling wallet submitTransaction...',
         )
 
         const submitResult =
@@ -460,11 +460,11 @@ export function createWalletProviders(
           )
 
         console.log(
-          '[Midnight] ✅ Lace accepted transaction submission.',
+          '[Midnight] ✅ Wallet accepted transaction submission.',
         )
 
         console.log(
-          '[Midnight] Lace submit response:',
+          '[Midnight] Wallet submit response:',
           submitResult,
         )
 
@@ -492,8 +492,8 @@ export function createWalletProviders(
 
         return txId
       } catch (err: any) {
-        logLaceError(
-          'LACE SUBMIT ERROR',
+        logWalletError(
+          'WALLET SUBMIT ERROR',
           err,
         )
 
