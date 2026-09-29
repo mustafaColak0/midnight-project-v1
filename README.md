@@ -557,9 +557,15 @@ The Level 3 demonstration will show the complete Private Eligibility Gate flow:
 11. Show the automated test suite passing.
 12. Show the GitHub Actions CI workflow passing.
 
+### Level 3 Demo Video
+
+[Watch the Level 3 Private Eligibility Gate Demo](https://drive.google.com/file/d/1eMzh6c98uPoV2iIJFWOvYzvleX3jMYiT/view)
+
+> The demo shows the complete Level 3 flow on Midnight Preprod, including 1AM wallet connection, private eligibility input, Zero-Knowledge proof generation, transaction submission, and successful threshold verification.
+
 ### Level 2 Demo Video
 
-[Watch the Level 2 Demo Video](https://drive.google.com/file/d/1eMzh6c98uPoV2iIJFWOvYzvleX3jMYiT/view)
+[Watch the Level 2 Demo Video](https://drive.google.com/file/d/107qt5FiF_Hee7QwmN7Yv5GzWbD1t2SiS/view)
 
 ## 📸 Previous Level 2 Evidence
 
