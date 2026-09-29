@@ -599,15 +599,16 @@ The Level 3 demonstration will show the complete Private Eligibility Gate flow:
 
 ### 3. Private Eligibility Proof on Preprod
 
-<!-- LEVEL-3-ELIGIBILITY-PROOF-SCREENSHOT -->
+<img width="1912" height="915" alt="Midnight-Level-3-Private-Eligibility-Proof-Preprod" src="https://github.com/user-attachments/assets/e7a1025b-18d9-422e-978c-cc7d37bff6fc" />
 
-> Final Level 3 eligibility proof screenshot will be added here.
+
+> The Private Eligibility Gate successfully verified the threshold proof on Midnight Preprod using 1AM. The public result was `thresholdProofVerified = true`, while the underlying secret value was not intentionally disclosed as public contract state.
 
 ### 4. Successful Level 3 Preprod Transaction
 
-<!-- LEVEL-3-PREPROD-TRANSACTION-SCREENSHOT -->
+<img width="1917" height="927" alt="Midnight-Level-3-Preprod-Transaction-Confirmed" src="https://github.com/user-attachments/assets/232a8cb8-88d5-4732-ba13-38c8dd14b9f5" />
 
-> Final Level 3 Preprod transaction screenshot will be added here.
+> The Level 3 eligibility proof transaction was successfully submitted and confirmed on Midnight Preprod.
 
 ---
 
