@@ -636,7 +636,7 @@ The Level 3 demonstration will show the complete Private Eligibility Gate flow:
 | Live frontend deployment | ✅ Available |
 | Level 3 test evidence | ✅ Captured |
 | Passing CI evidence | ✅ Captured |
-| Level 3 demo video | ⏳ To be added |
+| Level 3 demo video | ✅ Available |
 | Product proposal | ⏳ Submission / approval step |
 | Minimum 10 meaningful commits | ✅ See Git history |
 
