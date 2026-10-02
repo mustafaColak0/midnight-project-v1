@@ -7,7 +7,7 @@ import type { MidnightProviders } from '@midnight-ntwrk/midnight-js-types'
 import type { HelloWorldCircuitId } from './providers'
 
 export const CONTRACT_ADDRESS =
-  '82265fe547d93fda1dcc12c31f9ccc2a5b3a421c8cd3f1fbc072bad332b8192a'
+  '022d78119bca01fa590c08d0a0209bdbd1e1baef1e8fae6a49670e75ca8b3695'
 
 export type GovernanceVote = 'yes' | 'no'
 

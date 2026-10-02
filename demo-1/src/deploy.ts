@@ -226,6 +226,19 @@ async function main() {
   );
   if (unregisteredUtxos.length > 0) {
     console.log(`  Registering ${unregisteredUtxos.length} NIGHT UTXOs for DUST generation...`);
+    const { fee } =
+  await walletCtx.wallet.estimateRegistration(
+    unregisteredUtxos,
+  );
+
+console.log(
+  `  Waiting for sufficient generated DUST to cover the registration fee: ${fee.toLocaleString()}`,
+);
+
+await walletCtx.wallet.waitForGeneratedDust(
+  unregisteredUtxos,
+  fee,
+);
     // The signDustRegistration callback (3rd arg) already produces a recipe
     // with N signatures matching N inputs. Do NOT call signRecipe again — that
     // would double-sign and the chain rejects with InputsSignaturesLengthMismatch
