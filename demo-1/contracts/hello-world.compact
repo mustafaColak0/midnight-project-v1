@@ -2,30 +2,44 @@
 
 import CompactStandardLibrary;
 
-// Public ledger state
-export ledger message: Maybe<Opaque<"string">>;
-export ledger thresholdProofVerified: Boolean;
+export ledger proposalActive: Boolean;
+export ledger yesVotes: Counter;
+export ledger noVotes: Counter;
+export ledger totalVotes: Counter;
 
 constructor() {
-    message = none<Opaque<"string">>();
-    thresholdProofVerified = false;
+    proposalActive = true;
+    yesVotes = 0;
+    noVotes = 0;
+    totalVotes = 0;
 }
 
-// Existing public message circuit
-export circuit storeMessage(customMessage: Opaque<"string">): [] {
-    message = disclose(
-        some<Opaque<"string">>(customMessage)
+export circuit voteYes(secretValue: Uint<16>): [] {
+    assert(
+        proposalActive,
+        "The governance proposal is not active"
     );
-}
 
-// Privacy demo:
-// secretValue remains private.
-// The circuit only proves that it is >= 18.
-export circuit proveThreshold(secretValue: Uint<16>): [] {
     assert(
         secretValue >= 18,
-        "Secret value is below threshold"
+        "The private eligibility requirement was not satisfied"
     );
 
-    thresholdProofVerified = true;
+    yesVotes.increment(1);
+    totalVotes.increment(1);
+}
+
+export circuit voteNo(secretValue: Uint<16>): [] {
+    assert(
+        proposalActive,
+        "The governance proposal is not active"
+    );
+
+    assert(
+        secretValue >= 18,
+        "The private eligibility requirement was not satisfied"
+    );
+
+    noVotes.increment(1);
+    totalVotes.increment(1);
 }
