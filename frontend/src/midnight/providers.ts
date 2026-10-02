@@ -1,4 +1,4 @@
-import type { WalletConnectedAPI } from '@midnight-ntwrk/dapp-connector-api'
+﻿import type { WalletConnectedAPI } from '@midnight-ntwrk/dapp-connector-api'
 
 import { FetchZkConfigProvider } from '@midnight-ntwrk/midnight-js-fetch-zk-config-provider'
 import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider'
@@ -11,8 +11,8 @@ import type { MidnightProviders } from '@midnight-ntwrk/midnight-js-types'
 import { createWalletProviders } from './walletAdapter'
 
 export type HelloWorldCircuitId =
-  | 'proveThreshold'
-  | 'storeMessage'
+  | 'voteYes'
+  | 'voteNo'
 
 
 function getPrivateStatePassword(): string {
@@ -205,3 +205,4 @@ const publicDataProvider = indexerPublicDataProvider(
     midnightProvider,
   }
 }
+

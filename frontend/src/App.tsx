@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 
 import {
   ShieldCheck,
@@ -6,7 +6,6 @@ import {
   Radio,
   Lock,
   Vote,
-  ExternalLink,
   CheckCircle2,
   XCircle,
   Activity,
@@ -16,7 +15,7 @@ import {
 import type { WalletConnectedAPI } from "@midnight-ntwrk/dapp-connector-api";
 
 import { createMidnightProviders } from "./midnight/providers";
-import { provePrivateThreshold, CONTRACT_ADDRESS } from "./midnight/contract";
+import { castPrivateGovernanceVote, CONTRACT_ADDRESS } from "./midnight/contract";
 
 type InjectedMidnightWallet = {
   name?: string;
@@ -43,6 +42,8 @@ export default function App() {
   const [error, setError] = useState<string>("");
 
   const [secretValue, setSecretValue] = useState<string>("25");
+
+  const [selectedVote, setSelectedVote] = useState<"yes" | "no">("yes");
 
   const [proofLoading, setProofLoading] = useState<boolean>(false);
 
@@ -94,7 +95,7 @@ export default function App() {
       .filter((wallet): wallet is WalletOption => wallet !== null);
 
     console.log(
-      "[Wallet] ✅ Detected Midnight wallets:",
+      "[Wallet] Detected Midnight wallets:",
       detected.map((wallet) => ({
         id: wallet.id,
         name: wallet.name,
@@ -209,13 +210,13 @@ export default function App() {
 
       const connectedApi = await selectedWallet.api.connect("preprod");
 
-      console.log(`[Wallet] ✅ ${selectedWallet.name} CONNECT RETURNED`);
+      console.log(`[Wallet] ${selectedWallet.name} CONNECT RETURNED`);
 
       console.log("[Wallet] Calling getConnectionStatus...");
 
       const connectionStatus = await connectedApi.getConnectionStatus();
 
-      console.log("[Wallet] ✅ STATUS:", connectionStatus);
+      console.log("[Wallet] STATUS:", connectionStatus);
 
       if (connectionStatus.status !== "connected") {
         throw new Error(`Wallet connection status: ${connectionStatus.status}`);
@@ -232,7 +233,7 @@ export default function App() {
 
       const configuration = await connectedApi.getConfiguration();
 
-      console.log("[Wallet] ✅ CONFIG:", configuration);
+      console.log("[Wallet] CONFIG:", configuration);
 
       if (configuration.networkId?.toLowerCase() !== "preprod") {
         throw new Error(
@@ -245,7 +246,7 @@ export default function App() {
 
       const { unshieldedAddress } = await connectedApi.getUnshieldedAddress();
 
-      console.log("[Wallet] ✅ ADDRESS:", unshieldedAddress);
+      console.log("[Wallet] ADDRESS:", unshieldedAddress);
 
       /*
        * Use the Connected API instance of the selected wallet
@@ -266,7 +267,7 @@ export default function App() {
       localStorage.setItem("midnight_wallet_id", selectedWallet.id);
 
       console.log(
-        `🔥 ${selectedWallet.name.toUpperCase()} MIDNIGHT CONNECTOR WORKS IN REACT`,
+        `${selectedWallet.name.toUpperCase()} MIDNIGHT CONNECTOR WORKS IN REACT`,
       );
     } catch (err: any) {
       console.error("=== WALLET ERROR FULL ===");
@@ -332,7 +333,7 @@ export default function App() {
 
     if (!walletApi) {
       setError(
-        "Connect a Lace or 1AM Midnight wallet before generating a proof.",
+        "Connect a Midnight wallet before submitting a governance vote.",
       );
       return;
     }
@@ -344,7 +345,7 @@ export default function App() {
       parsedValue < 0 ||
       parsedValue > 65535
     ) {
-      setError("The secret value must be an integer between 0 and 65535.");
+      setError("The private eligibility value must be an integer between 0 and 65535.");
       return;
     }
 
@@ -353,34 +354,38 @@ export default function App() {
     setError("");
 
     try {
-      console.log("[Midnight] Preparing private threshold proof...");
-
+      console.log("[Midnight] Preparing private governance eligibility proof.");
       console.log("[Midnight] Active wallet:", connectedWalletName);
+      console.log("[Midnight] Selected vote:", selectedVote.toUpperCase());
 
       const providers = await createMidnightProviders(walletApi);
 
-      console.log("[Midnight] Providers created.");
+      console.log("[Midnight] Governance providers created.");
 
-      await provePrivateThreshold(providers, BigInt(parsedValue));
+      await castPrivateGovernanceVote(
+        providers,
+        BigInt(parsedValue),
+        selectedVote,
+      );
 
       setProofVerified(true);
 
       console.log(
-        `[Midnight] ✅ Threshold proof verified on Preprod using ${connectedWalletName}.`,
+        `[Midnight] Governance vote confirmed on Preprod using ${connectedWalletName}.`,
       );
-    } catch (err: any) {
-      console.error("[Midnight] Proof failed:", err);
+    } catch (err: unknown) {
+      console.error("[Midnight] Governance vote failed:", err);
 
-      console.error("[Midnight] Proof error cause:", err?.cause);
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Private governance vote failed.";
 
-      setError(
-        err instanceof Error ? err.message : "Private threshold proof failed.",
-      );
+      setError(message);
     } finally {
       setProofLoading(false);
     }
   };
-
   const shortenAddress = (addr: string) => {
     if (!addr) {
       return "";
@@ -403,11 +408,11 @@ export default function App() {
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-lg font-bold text-white tracking-wide">
-                  Midnight Privacy-Preserving Voting
+                  Private DAO Decision Engine
                 </h1>
 
                 <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                  • ZK Proofs
+                  ZK Proofs
                 </span>
               </div>
 
@@ -459,7 +464,7 @@ export default function App() {
               onClick={() => setError("")}
               className="text-slate-400 hover:text-white"
             >
-              ✕
+              X
             </button>
           </div>
         )}
@@ -516,7 +521,7 @@ export default function App() {
                   <div className="flex items-center gap-2 text-[11px] text-slate-400">
                     <ShieldCheck className="w-4 h-4 text-purple-400" />
 
-                    <span>Identity shielded via ZK-Proof Engine</span>
+                    <span>Connected to Midnight Preprod</span>
                   </div>
                 </div>
               ) : (
@@ -554,7 +559,7 @@ export default function App() {
 
                         {availableWallets.map((wallet) => (
                           <option key={wallet.id} value={wallet.id}>
-                            {wallet.name} — API {wallet.apiVersion}
+                            {wallet.name} - API {wallet.apiVersion}
                           </option>
                         ))}
                       </select>
@@ -633,13 +638,13 @@ export default function App() {
             </div>
           </div>
 
-          {/* PROOF CARD */}
+          {/* GOVERNANCE CARD */}
 
           <div className="md:col-span-2 p-5 bg-slate-900/60 border border-slate-800 rounded-2xl space-y-5 shadow-lg">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
               <span className="text-xs font-semibold uppercase text-slate-400 tracking-wider flex items-center gap-2">
                 <Vote className="w-4 h-4 text-purple-400" />
-                Private Threshold Proof
+                Private Governance Proposal
               </span>
 
               <span className="text-[10px] font-mono text-purple-300">
@@ -649,17 +654,55 @@ export default function App() {
 
             <div className="space-y-2">
               <p className="text-sm text-slate-200 font-semibold">
-                Prove your secret value is at least 18
+                Treasury Proposal #001
+              </p>
+
+              <p className="text-base text-white font-semibold">
+                Should the DAO fund Project Alpha?
               </p>
 
               <p className="text-xs text-slate-400 leading-relaxed">
-                The secret value is used as a private circuit input. Only the
-                statement{" "}
+                Eligibility is verified using a private circuit input. The
+                private value must satisfy{" "}
                 <span className="text-purple-300 font-mono">
-                  secretValue ≥ 18
-                </span>{" "}
-                is proven.
+                  secretValue &gt;= 18
+                </span>
+                .
               </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                disabled={!isConnected || proofLoading}
+                onClick={() => {
+                  setSelectedVote("yes");
+                  setProofVerified(false);
+                }}
+                className={`p-3 rounded-xl border text-sm font-bold transition-all disabled:opacity-50 ${
+                  selectedVote === "yes"
+                    ? "bg-emerald-500/15 border-emerald-500/50 text-emerald-300"
+                    : "bg-slate-950/70 border-slate-800 text-slate-400 hover:border-slate-700"
+                }`}
+              >
+                YES
+              </button>
+
+              <button
+                type="button"
+                disabled={!isConnected || proofLoading}
+                onClick={() => {
+                  setSelectedVote("no");
+                  setProofVerified(false);
+                }}
+                className={`p-3 rounded-xl border text-sm font-bold transition-all disabled:opacity-50 ${
+                  selectedVote === "no"
+                    ? "bg-rose-500/15 border-rose-500/50 text-rose-300"
+                    : "bg-slate-950/70 border-slate-800 text-slate-400 hover:border-slate-700"
+                }`}
+              >
+                NO
+              </button>
             </div>
 
             {isConnected && connectedWalletName && (
@@ -676,7 +719,7 @@ export default function App() {
 
             <div className="space-y-2">
               <label className="text-[11px] uppercase tracking-wider text-slate-500 font-mono">
-                Secret value — never displayed on-chain
+                Private eligibility value
               </label>
 
               <input
@@ -686,12 +729,16 @@ export default function App() {
                 disabled={!isConnected || proofLoading}
                 onChange={(event) => {
                   setSecretValue(event.target.value);
-
                   setProofVerified(false);
                 }}
-                placeholder="Enter a private number"
+                placeholder="Enter a private eligibility value"
                 className="w-full p-3 bg-slate-950/80 border border-slate-800 rounded-xl text-sm text-purple-200 font-mono outline-none focus:border-purple-500 disabled:opacity-50"
               />
+
+              <p className="text-[10px] text-slate-500">
+                The eligibility value is used as a private circuit input and is
+                not intentionally stored in the public contract ledger.
+              </p>
             </div>
 
             <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-xl">
@@ -709,21 +756,22 @@ export default function App() {
 
             {!isConnected ? (
               <span className="text-xs text-amber-400/80 font-mono">
-                ⚠️ Connect a Midnight wallet before generating the proof.
+                Connect a Midnight wallet before submitting a governance vote.
               </span>
             ) : proofVerified ? (
               <div className="space-y-2 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
                 <div className="flex items-center gap-2 text-xs text-emerald-400 font-semibold">
                   <CheckCircle2 className="w-4 h-4" />
-                  Private threshold proof verified on Preprod.
+                  Governance vote transaction confirmed on Preprod.
                 </div>
 
                 <p className="text-[11px] text-slate-300 font-mono">
-                  Public result: thresholdProofVerified = true
+                  Submitted vote: {selectedVote.toUpperCase()}
                 </p>
 
                 <p className="text-[11px] text-purple-300">
-                  🔒 The secret value was not disclosed to the public ledger.
+                  The private eligibility value was not intentionally written to
+                  the public ledger.
                 </p>
 
                 {connectedWalletName && (
@@ -736,25 +784,25 @@ export default function App() {
               <button
                 disabled={proofLoading || !secretValue || !isConnected}
                 onClick={handleProof}
-                className="w-full sm:w-auto px-6 py-2.5 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-600/20 cursor-pointer"
+                className="w-full px-6 py-2.5 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-600/20 cursor-pointer"
               >
                 <ShieldCheck className="w-4 h-4" />
 
                 {proofLoading
-                  ? "Generating ZK Proof..."
-                  : "Generate Private Proof"}
+                  ? "Generating Proof & Submitting Vote..."
+                  : `Generate Proof & Vote ${selectedVote.toUpperCase()}`}
               </button>
             )}
           </div>
         </div>
 
-        {/* TABLE */}
+        {/* GOVERNANCE STATUS */}
 
-        <div className="border border-slate-800 rounded-2xl overflow-hidden bg-slate-900/40 shadow-xl">
-          <div className="px-5 py-3.5 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
+        <div className="p-5 border border-slate-800 rounded-2xl bg-slate-900/40 shadow-xl space-y-4">
+          <div className="flex items-center justify-between gap-3">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
               <Activity className="w-4 h-4 text-purple-400" />
-              Verified Zero-Knowledge Execution Stream
+              Governance Privacy Model
             </span>
 
             <span className="text-[11px] font-mono text-purple-300">
@@ -762,57 +810,49 @@ export default function App() {
             </span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950/80 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800 font-mono">
-                <tr>
-                  <th className="px-5 py-3">Public Nullifier</th>
+          <div className="grid md:grid-cols-3 gap-3 text-xs">
+            <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-xl">
+              <span className="block text-slate-500 uppercase text-[10px] mb-1">
+                Eligibility
+              </span>
+              <span className="text-emerald-300">
+                Private circuit input
+              </span>
+            </div>
 
-                  <th className="px-5 py-3">Proof Type</th>
+            <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-xl">
+              <span className="block text-slate-500 uppercase text-[10px] mb-1">
+                Requirement
+              </span>
+              <span className="text-purple-300 font-mono">
+                secretValue &gt;= 18
+              </span>
+            </div>
 
-                  <th className="px-5 py-3">Status</th>
-
-                  <th className="px-5 py-3 text-right">Explorer</th>
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-slate-800/60 font-mono">
-                <tr className="hover:bg-slate-800/30 transition-colors">
-                  <td className="px-5 py-3 text-purple-300 font-semibold">
-                    0x8a91...4c92
-                  </td>
-
-                  <td className="px-5 py-3">
-                    <span className="bg-purple-500/10 text-purple-300 border border-purple-500/20 px-2 py-0.5 rounded text-[11px]">
-                      ZK_VOTE_RECORD
-                    </span>
-                  </td>
-
-                  <td className="px-5 py-3">
-                    <span className="inline-flex items-center gap-1.5 text-emerald-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                      Shielded & Proven
-                    </span>
-                  </td>
-
-                  <td className="px-5 py-3 text-right">
-                    <a
-                      href="https://midnightexplorer.com/"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center justify-end gap-1.5 text-[11px] text-slate-400 hover:text-purple-300 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700/60 transition-colors ml-auto"
-                    >
-                      <span>Proof</span>
-
-                      <ExternalLink className="w-3 h-3 shrink-0" />
-                    </a>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-xl">
+              <span className="block text-slate-500 uppercase text-[10px] mb-1">
+                Vote Direction
+              </span>
+              <span className="text-slate-300">
+                Public through the selected vote circuit
+              </span>
+            </div>
           </div>
-        </div>
-      </div>
+
+          <p className="text-[11px] text-slate-500 leading-relaxed">
+            This MVP provides privacy-preserving eligibility verification for
+            governance participation. The current vote direction is not private,
+            and duplicate-vote prevention is not yet implemented.
+          </p>
+        </div>      </div>
     </div>
   );
 }
+
+
+
+
+
+
+
+

@@ -1,13 +1,15 @@
-import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js'
+﻿import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js'
 import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts'
-import { validateSecretValue } from "./eligibility";
+import { validateSecretValue } from './eligibility'
 import * as HelloWorld from '../generated/hello-world/index.js'
 
 import type { MidnightProviders } from '@midnight-ntwrk/midnight-js-types'
 import type { HelloWorldCircuitId } from './providers'
 
 export const CONTRACT_ADDRESS =
-  "82265fe547d93fda1dcc12c31f9ccc2a5b3a421c8cd3f1fbc072bad332b8192a";
+  '82265fe547d93fda1dcc12c31f9ccc2a5b3a421c8cd3f1fbc072bad332b8192a'
+
+export type GovernanceVote = 'yes' | 'no'
 
 export const compiledHelloWorldContract =
   CompiledContract.make(
@@ -22,7 +24,7 @@ export async function findHelloWorldContract(
   providers: MidnightProviders<HelloWorldCircuitId>,
 ) {
   console.log(
-    '[Midnight] Connecting to Preprod contract:',
+    '[Midnight] Connecting to Preprod governance contract:',
     CONTRACT_ADDRESS,
   )
 
@@ -34,68 +36,48 @@ export async function findHelloWorldContract(
     },
   )
 
-  console.log('[Midnight] Contract found.')
   const rawState =
-  await providers.publicDataProvider.queryContractState(
-    CONTRACT_ADDRESS,
-  );
+    await providers.publicDataProvider.queryContractState(
+      CONTRACT_ADDRESS,
+    )
 
-console.log(
-  "[DEBUG] Raw contract state:",
-  rawState,
-);
+  if (!rawState) {
+    throw new Error(
+      'Governance contract state could not be loaded from Preprod.',
+    )
+  }
 
-console.log(
-  "[DEBUG] State data constructor:",
-  rawState?.data?.constructor?.name,
-);
-
-if (!rawState) {
-  throw new Error(
-    "Contract state could not be loaded from Preprod.",
-  );
-}
-
-try {
-  const decodedLedger =
-    HelloWorld.ledger(rawState.data);
+  const decodedLedger = HelloWorld.ledger(rawState.data)
 
   console.log(
-    "[DEBUG] Decoded ledger:",
+    '[Midnight] Governance contract state loaded.',
     decodedLedger,
-  );
-} catch (error) {
-  console.error(
-    "[DEBUG] LEDGER DECODE FAILED:",
-    error,
-  );
-
-  throw error;
-}
+  )
 
   return contract
 }
 
-export async function provePrivateThreshold(
+export async function castPrivateGovernanceVote(
   providers: MidnightProviders<HelloWorldCircuitId>,
   secretValue: bigint,
+  vote: GovernanceVote,
 ) {
-  validateSecretValue(secretValue);
+  validateSecretValue(secretValue)
 
   const contract =
     await findHelloWorldContract(providers)
 
   console.log(
-    '[Midnight] Calling proveThreshold...',
+    `[Midnight] Submitting ${vote.toUpperCase()} governance vote.`,
   )
 
   const result =
-    await contract.callTx.proveThreshold(
-      secretValue,
-    )
+    vote === 'yes'
+      ? await contract.callTx.voteYes(secretValue)
+      : await contract.callTx.voteNo(secretValue)
 
   console.log(
-    '[Midnight] proveThreshold completed.',
+    '[Midnight] Governance vote transaction completed.',
     result,
   )
 

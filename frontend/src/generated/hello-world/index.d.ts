@@ -4,32 +4,28 @@ export type Witnesses<PS> = {
 }
 
 export type ImpureCircuits<PS> = {
-  storeMessage(context: __compactRuntime.CircuitContext<PS>,
-               customMessage_0: string): __compactRuntime.CircuitResults<PS, []>;
-  proveThreshold(context: __compactRuntime.CircuitContext<PS>,
-                 secretValue_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  voteYes(context: __compactRuntime.CircuitContext<PS>, secretValue_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  voteNo(context: __compactRuntime.CircuitContext<PS>, secretValue_0: bigint): __compactRuntime.CircuitResults<PS, []>;
 }
 
 export type ProvableCircuits<PS> = {
-  storeMessage(context: __compactRuntime.CircuitContext<PS>,
-               customMessage_0: string): __compactRuntime.CircuitResults<PS, []>;
-  proveThreshold(context: __compactRuntime.CircuitContext<PS>,
-                 secretValue_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  voteYes(context: __compactRuntime.CircuitContext<PS>, secretValue_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  voteNo(context: __compactRuntime.CircuitContext<PS>, secretValue_0: bigint): __compactRuntime.CircuitResults<PS, []>;
 }
 
 export type PureCircuits = {
 }
 
 export type Circuits<PS> = {
-  storeMessage(context: __compactRuntime.CircuitContext<PS>,
-               customMessage_0: string): __compactRuntime.CircuitResults<PS, []>;
-  proveThreshold(context: __compactRuntime.CircuitContext<PS>,
-                 secretValue_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  voteYes(context: __compactRuntime.CircuitContext<PS>, secretValue_0: bigint): __compactRuntime.CircuitResults<PS, []>;
+  voteNo(context: __compactRuntime.CircuitContext<PS>, secretValue_0: bigint): __compactRuntime.CircuitResults<PS, []>;
 }
 
 export type Ledger = {
-  readonly message: string;
-  readonly thresholdProofVerified: boolean;
+  readonly proposalActive: boolean;
+  readonly yesVotes: bigint;
+  readonly noVotes: bigint;
+  readonly totalVotes: bigint;
 }
 
 export type ContractReferenceLocations = any;
