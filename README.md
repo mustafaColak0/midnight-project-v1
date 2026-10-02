@@ -1,125 +1,161 @@
-# 🌓 Midnight Level 3 — First Quarter
+# 🌙 Midnight Level 4 — Private DAO Decision Engine
 
-## Private Eligibility Gate — Privacy-Preserving Zero-Knowledge DApp
+## Privacy-Preserving Governance MVP on Midnight
 
-This repository contains my **Level 3 — First Quarter** submission for the Midnight Network development track.
+This repository contains my **Level 4** submission for the Midnight Network development track.
 
-The project demonstrates a production-oriented privacy-preserving eligibility verification DApp built with Midnight. A user can prove that a private value satisfies an eligibility threshold without intentionally revealing the underlying value on the public ledger.
+The project introduces a **Private DAO Decision Engine**, a privacy-preserving governance MVP built on Midnight. It extends the previous Private Eligibility Gate into a governance flow where a user provides a private eligibility value and, after satisfying the required threshold, can participate in a DAO proposal through the deployed Compact contract.
 
-The Level 3 implementation extends the previous Preprod DApp with automated testing, CI/CD, an explicit privacy model, and a real-world **Private Eligibility Gate** use case.
+The Level 4 Compact contract introduces two governance circuits:
 
-The project demonstrates a frontend application connected to a deployed Compact smart contract on **Midnight Preprod**, wallet integration through the **Midnight DApp Connector API**, and a successful Zero-Knowledge circuit execution where a private value can be verified without revealing the value itself on the public ledger.
+- `voteYes(secretValue)`
+- `voteNo(secretValue)`
+
+Both circuits require the private eligibility condition:
+
+```text
+secretValue >= 18
+```
+
+The underlying secretValue is not intentionally stored as public contract state.
+The current MVP records governance participation through public yesVotes, noVotes, and totalVotes counters. Because voteYes and voteNo are separate circuits, the selected vote direction should not be considered private in the current implementation.
+Level 4 adds a new governance contract deployed on Midnight Preprod, generated Compact artifacts, governance frontend integration, automated validation tests, and production build verification.
+Current privacy scope: eligibility input privacy is implemented. Private ballot direction and duplicate-vote prevention are not yet implemented and are documented as future extensions.
 
 ---
 
 ## 🌐 Live Demo
 
 **Live Application:**  
-[Midnight Private Eligibility Gate](https://midnight-privacy-voting.vercel.app/)
+[Midnight Private DAO Decision Engine](https://midnight-privacy-voting.vercel.app/)
 
-> The application is configured for the Midnight **Preprod** network.
+> The application targets the Midnight **Preprod** network.
+
+> The hosted frontend demonstrates the Level 4 governance interface. Proof execution currently depends on the configured Midnight proof infrastructure, so remote transaction execution should not be assumed unless the required proof service is available.
 
 ---
 
-## 🌐 Preprod Deployment
+## 🌐 Level 4 Preprod Contract
 
 **Network:** Midnight Preprod
 
-**Contract Address:**
+**Level 4 Governance Contract Address:**
 
 ```text
-82265fe547d93fda1dcc12c31f9ccc2a5b3a421c8cd3f1fbc072bad332b8192a
+022d78119bca01fa590c08d0a0209bdbd1e1baef1e8fae6a49670e75ca8b3695
 ```
 
-The frontend connects to this deployed Compact contract and calls its circuit using the Midnight.js SDK.
+The frontend is configured to connect to this deployed Compact governance contract through the Midnight.js provider architecture.
+The contract currently exposes two governance circuits:
+
+```
+voteYes(secretValue)
+voteNo(secretValue)
+```
+Both circuits enforce the private eligibility requirement before incrementing the corresponding public governance counters.
 
 ---
 
-## 💡 Project Idea — Private Eligibility Gate
+## 💡 Project Idea — Private DAO Decision Engine
 
-The Level 3 product idea is a **Private Eligibility Gate** built on Midnight.
+The Level 4 product evolves the previous **Private Eligibility Gate** into a reusable privacy-preserving governance foundation.
 
-Many applications need to determine whether a user satisfies an eligibility requirement without needing to know the user's exact private value. Examples include age-gated services, membership requirements, access-control systems, and privacy-preserving qualification checks.
+Traditional governance systems may require participants to disclose information that is only needed to determine whether they are eligible to participate. The Private DAO Decision Engine explores how Midnight Zero-Knowledge technology can minimize that disclosure.
 
-In this DApp, the user provides a private value locally and the Compact circuit verifies whether:
+In the current MVP, a participant provides a private eligibility value:
 
 ```text
+secretValue
+```
+The Compact governance circuit verifies:
+
+```
 secretValue >= 18
 ```
 
-The underlying secretValue is not intentionally published as public contract state.
+If the requirement is satisfied, the participant can invoke either:
+voteYes(secretValue)
 
-Instead, the application exposes the successful verification result:
+or:
+voteNo(secretValue)
 
-thresholdProofVerified = true
+The exact private eligibility value is not intentionally written to the public contract state.
+Current Governance State
+The contract maintains the following public state:
 
-This allows the DApp to answer the question:
+proposalActive
+yesVotes
+noVotes
+totalVotes
 
-"Does the user satisfy the required eligibility threshold?"
-
-without requiring the application to publicly disclose the exact private value used to produce the proof.
-
-Product Goal
-
-The goal is to demonstrate how Midnight Zero-Knowledge technology can support real-world eligibility verification while minimizing unnecessary disclosure of private information.
+This allows the MVP to demonstrate private eligibility verification combined with publicly verifiable governance counters.
+Long-Term Direction
+The Private DAO Decision Engine is designed as a foundation for additional privacy-preserving governance primitives, including:
+- Nullifier-based duplicate participation protection
+- Credential-based governance eligibility
+- Privacy-preserving quadratic governance
+- Stronger ballot privacy
+- Anonymous organizational governance and reporting workflows
+These capabilities are part of the project roadmap and are not claimed as implemented in the current Level 4 MVP.
 
 ---
 
-## 🔐 Level 3 Privacy Model
+## 🔐 Level 4 Privacy Model
 
-The privacy model of the Private Eligibility Gate separates the user's private input from the information intentionally exposed through the application's public contract state.
+The Level 4 privacy model separates the participant's private eligibility input from the governance information intentionally exposed through public contract state.
 
-### What an Observer CAN Learn
+### What Remains Private
 
-An observer can learn:
-
-- That an eligibility proof was successfully submitted.
-- That the required eligibility condition was satisfied.
-- The public verification result: `thresholdProofVerified = true`.
-- Public transaction metadata and contract information exposed by Midnight Preprod.
-
-### What an Observer CANNOT Learn From the Application's Intended Public State
-
-An observer cannot learn the exact private `secretValue` merely from the application's intended public contract state.
-
-For example, if a user provides:
+The participant provides:
 
 ```text
-25
+secretValue
 ```
 
-the circuit proves:
+as the eligibility input used by the Compact circuit.
+The application does not intentionally store the exact secretValue in the public governance ledger state.
+For example, if the participant provides:
+21
 
-```text
-secretValue >= 18
-```
+the governance circuit evaluates:
+21 >= 18
 
-without publishing `25` as public contract state.
+without intentionally storing 21 as a public governance state value.
+What Is Public
+The current Level 4 contract intentionally maintains:
+proposalActive
+yesVotes
+noVotes
+totalVotes
 
-The observable result is:
-
-```text
-thresholdProofVerified = true
-```
-
-without intentionally publishing 25 as public contract state.
-
-The privacy boundary is:
-
-Therefore:
-
-```text
-Private secret value
+These values are part of the public governance state.
+The current implementation also uses separate voteYes and voteNo circuits. Therefore, vote direction is not treated as private in the current MVP.
+Current Privacy Boundary
+Private eligibility value
         │
         ▼
-Compact Zero-Knowledge Circuit
+Compact governance circuit
         │
-        ├── Exact value remains private
+        ├── Verify secretValue >= 18
+        │
+        ├── Exact eligibility value is not intentionally stored
         │
         ▼
-Public eligibility result
-```
+Selected governance circuit
+(voteYes / voteNo)
+        │
+        ▼
+Public governance counters
+(yesVotes / noVotes / totalVotes)
 
+Current Limitations
+The Level 4 MVP does not yet implement:
+- Private ballot direction
+- Nullifier-based duplicate-vote prevention
+- One-person-one-vote identity guarantees
+- Anonymous credential verification
+- Quadratic voting
+These are planned extensions of the Private DAO Decision Engine rather than features claimed by the current implementation.
 This demonstrates the separation between **private witness data** and **publicly verifiable state** provided by Midnight.
 
 ---
@@ -294,6 +330,88 @@ The Level 3 frontend includes:
 - GitHub Actions CI/CD
 - Automated production build validation
 ---
+
+## 🔨 Level 4 Compact Contract Compilation
+
+The Level 4 governance contract introduces the `voteYes` and `voteNo` circuits for the Private DAO Decision Engine.
+
+Both governance circuits were successfully compiled with the Midnight Compact compiler.
+
+### 📸 Compilation Evidence
+
+<img width="1087" height="291" alt="Midnight-Level-4-Governance-Contract-Compile-Success" src="https://github.com/user-attachments/assets/82082735-ce0d-4112-aa05-f30e16c034b5" />
+
+## 🌐 Level 4 Preprod Deployment
+
+The compiled governance contract was successfully deployed to the Midnight Preprod network.
+
+**Network:** Midnight Preprod
+
+**Contract Address:**
+
+```text
+022d78119bca01fa590c08d0a0209bdbd1e1baef1e8fae6a49670e75ca8b3695
+```
+### 📸 Preprod Deployment Evidence
+<img width="1350" height="787" alt="Midnight-Level-4-Governance-Contract-Preprod-Deployment" src="https://github.com/user-attachments/assets/7812101b-147d-4667-992a-65a7f1507151" />
+
+## 👛 Level 4 Preprod Wallet Setup
+
+A dedicated development wallet was synchronized with the Midnight Preprod network before funding and contract deployment.
+
+### 📸 Wallet Synchronization Evidence
+
+<img width="590" height="597" alt="Midnight-Level-4-Preprod-Wallet-Sync-Completed" src="https://github.com/user-attachments/assets/fb04b7f3-1d3f-49fb-81b4-eac2166e7d24" />
+
+### 📸 Preprod Faucet Funding
+
+The development wallet was funded with 5,000 tNIGHT from the Midnight Preprod faucet for contract deployment and testing.
+
+<img width="842" height="762" alt="Midnight-Level-4-Preprod-Wallet-Funded-5000-tNight" src="https://github.com/user-attachments/assets/d957b1e7-4a8f-4439-be28-6e4f7c9ff392" />
+
+### 📸 Funded Wallet Verification
+
+After funding, the development wallet balance was verified on Midnight Preprod before the governance contract deployment.
+
+<img width="1290" height="552" alt="Midnight-Level-4-Preprod-Wallet-Funded-and-Synced" src="https://github.com/user-attachments/assets/346b38cf-1a49-4102-8f05-23737c50c0b7" />
+
+## 🧪 Level 4 Automated Tests
+
+The Level 4 frontend validation suite verifies the supported private input range and the eligibility threshold behavior used by the governance flow.
+
+The automated test suite contains seven tests covering:
+
+- Minimum supported private value (`0`)
+- Maximum supported private value (`65535`)
+- Values below the supported range
+- Values above the supported range
+- A value below the eligibility threshold (`17`)
+- The exact eligibility threshold (`18`)
+- A value above the eligibility threshold
+
+Current result:
+
+```text
+Test Files  1 passed (1)
+Tests       7 passed (7)
+```
+
+### 📸 Automated Test Evidence
+<img width="821" height="495" alt="Midnight-Level-4-Frontend-Tests-Passed" src="https://github.com/user-attachments/assets/0ccf536d-58a6-4ba9-aa77-eba33da6b5d9" />
+
+## 🏗️ Level 4 Production Build
+
+The Level 4 frontend successfully completes the production build process.
+
+The production build validates that the React application, generated Compact bindings, Midnight providers, and governance integration can be bundled for deployment.
+
+```bash
+cd frontend
+npm run build
+```
+
+### 📸 Production Build Evidence
+<img width="910" height="726" alt="Midnight-Level-4-Frontend-Build-Success" src="https://github.com/user-attachments/assets/c5d63f58-6310-4a78-8bef-29f3fac7788f" />
 
 ## 🛠️ Technology Stack
 
