@@ -4,15 +4,15 @@
   "runtime-version": "0.16.0",
   "circuits": [
     {
-      "name": "storeMessage",
+      "name": "voteYes",
       "pure": false,
       "proof": true,
       "arguments": [
         {
-          "name": "customMessage",
+          "name": "secretValue",
           "type": {
-            "type-name": "Opaque",
-            "tsType": "string"
+            "type-name": "Uint",
+            "maxval": 65535
           }
         }
       ],
@@ -23,7 +23,7 @@
       }
     },
     {
-      "name": "proveThreshold",
+      "name": "voteNo",
       "pure": false,
       "proof": true,
       "arguments": [
@@ -48,23 +48,31 @@
   ],
   "ledger": [
     {
-      "name": "message",
+      "name": "proposalActive",
       "index": 0,
-      "exported": true,
-      "storage": "Cell",
-      "type": {
-        "type-name": "Opaque",
-        "tsType": "string"
-      }
-    },
-    {
-      "name": "thresholdProofVerified",
-      "index": 1,
       "exported": true,
       "storage": "Cell",
       "type": {
         "type-name": "Boolean"
       }
+    },
+    {
+      "name": "yesVotes",
+      "index": 1,
+      "exported": true,
+      "storage": "Counter"
+    },
+    {
+      "name": "noVotes",
+      "index": 2,
+      "exported": true,
+      "storage": "Counter"
+    },
+    {
+      "name": "totalVotes",
+      "index": 3,
+      "exported": true,
+      "storage": "Counter"
     }
   ]
 }

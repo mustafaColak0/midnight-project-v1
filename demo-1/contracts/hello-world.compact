@@ -9,9 +9,6 @@ export ledger totalVotes: Counter;
 
 constructor() {
     proposalActive = true;
-    yesVotes = 0;
-    noVotes = 0;
-    totalVotes = 0;
 }
 
 export circuit voteYes(secretValue: Uint<16>): [] {
