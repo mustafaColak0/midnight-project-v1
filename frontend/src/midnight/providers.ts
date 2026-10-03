@@ -59,11 +59,6 @@ export async function createMidnightProviders(
     configuration.networkId,
   )
 
-  console.log(
-    '[Midnight] Indexer:',
-    configuration.indexerUri,
-  )
-
 
   // --------------------------------------------------
   // NETWORK CHECK
@@ -139,13 +134,13 @@ const proofServer =
   // PUBLIC DATA PROVIDER
   // --------------------------------------------------
 
- const indexerHttp =
+const indexerHttp =
   import.meta.env.VITE_INDEXER_HTTP_URL ||
-  'https://indexer.preprod.midnight.network/api/v3/graphql'
+  'https://indexer.preprod.midnight.network/api/v4/graphql'
 
 const indexerWs =
   import.meta.env.VITE_INDEXER_WS_URL ||
-  'wss://indexer.preprod.midnight.network/api/v3/graphql/ws'
+  'wss://indexer.preprod.midnight.network/api/v4/graphql/ws'
 
 console.log('[Midnight] Indexer HTTP:', indexerHttp)
 console.log('[Midnight] Indexer WS:', indexerWs)
