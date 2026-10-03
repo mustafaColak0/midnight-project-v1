@@ -48,14 +48,11 @@ Current privacy scope: eligibility input privacy is implemented. Private ballot 
 The frontend is configured to connect to this deployed Compact governance contract through the Midnight.js provider architecture.
 The contract currently exposes two governance circuits:
 
-```
+```text
 voteYes(secretValue)
 voteNo(secretValue)
 ```
 
-Updated upstream
-
-Stashed changes
 Both circuits enforce the private eligibility requirement before incrementing the corresponding public governance counters.
 
 ---
@@ -72,9 +69,6 @@ In the current MVP, a participant provides a private eligibility value:
 secretValue
 ```
 
-Updated upstream
-
-Stashed changes
 The Compact governance circuit verifies:
 
 ```
@@ -102,23 +96,15 @@ This allows the MVP to demonstrate private eligibility verification combined wit
 
 ### Long-Term Direction
 
-Updated upstream
 The Private DAO Decision Engine is designed as a foundation for additional privacy-preserving governance primitives, including:
-
-The Private DAO Decision Engine is designed as a foundation for additional privacy-preserving governance primitives, including:
-
-Stashed changes
 
 - Nullifier-based duplicate participation protection
 - Credential-based governance eligibility
 - Privacy-preserving quadratic governance
 - Stronger ballot privacy
 - Anonymous organizational governance and reporting workflows
-  Updated upstream
-  These capabilities are part of the project roadmap and are not claimed as implemented in the current Level 4 MVP.
 
   These capabilities are part of the project roadmap and are not claimed as implemented in the current Level 4 MVP.
-  Stashed changes
 
 ---
 
@@ -138,16 +124,6 @@ as the eligibility input used by the Compact circuit.
 The application does not intentionally store the exact secretValue in the public governance ledger state.
 For example, if the participant provides:
 21
-Updated upstream
-
-the governance circuit evaluates:
-21 >= 18
-
-without intentionally storing 21 as a public governance state value.
-
-### What Is Public
-
-# The current Level 4 contract intentionally maintains:
 
 the governance circuit evaluates:
 21 >= 18
@@ -220,83 +196,14 @@ without intentionally storing the exact value 21 in the public governance counte
 ### Public Governance State
 
 The Level 4 contract maintains publicly verifiable governance state:
-
-> > > > > > > Stashed changes
-> > > > > > > proposalActive
-> > > > > > > yesVotes
-> > > > > > > noVotes
-> > > > > > > totalVotes
-
-Updated upstream
-These values are part of the public governance state.
-The current implementation also uses separate voteYes and voteNo circuits. Therefore, vote direction is not treated as private in the current MVP.
-
-### Current Privacy Boundary
-
-Private eligibility value
-│
-▼
-Compact governance circuit
-│
-├── Verify secretValue >= 18
-│
-├── Exact eligibility value is not intentionally stored
-│
-▼
-Selected governance circuit
-(voteYes / voteNo)
-│
-▼
-Public governance counters
-(yesVotes / noVotes / totalVotes)
-
-### Current Limitations
-
-The Level 4 MVP does not yet implement:
-
-- Private ballot direction
-- Nullifier-based duplicate-vote prevention
-- One-person-one-vote identity guarantees
-- Anonymous credential verification
-- Quadratic voting
-  These are planned extensions of the Private DAO Decision Engine rather than features claimed by the current implementation.
-  This demonstrates the separation between **private witness data** and **publicly verifiable state** provided by Midnight.
-
----
-
-## 🧠 Private Witness vs Public Governance State
-
-### Private Input
-
-The governance flow receives `secretValue` as the private eligibility input used by the Compact circuit.
-
-The exact eligibility value is not intentionally written to the public governance state.
-
-For example:
-
-```text
-secretValue = 21
-```
-
-The circuit can evaluate:
-secretValue >= 18
-
-without intentionally storing the exact value 21 in the public governance counters.
-
-### Public Governance State
-
-The Level 4 contract maintains publicly verifiable governance state:
 proposalActive
 yesVotes
 noVotes
 totalVotes
 
-=======
-
-> > > > > > > Stashed changes
-> > > > > > > A successful governance transaction updates the corresponding public counters.
-> > > > > > > Because the current implementation exposes separate voteYes and voteNo circuits and public vote counters, the current MVP does not claim ballot-direction privacy.
-> > > > > > > This architecture demonstrates how private eligibility data can be separated from publicly verifiable governance state.
+A successful governance transaction updates the corresponding public counters.
+Because the current implementation exposes separate voteYes and voteNo circuits and public vote counters, the current MVP does not claim ballot-direction privacy.
+This architecture demonstrates how private eligibility data can be separated from publicly verifiable governance state.
 
 ---
 
@@ -398,16 +305,9 @@ Transaction Submission
 Midnight Preprod
 ```
 
-Updated upstream
 The eligibility value is used as private circuit input and is not intentionally stored in the public governance state.
 The selected governance circuit updates the corresponding public vote counter together with totalVotes.
 Privacy note: The current MVP protects the eligibility input from intentional public-state disclosure, but the selected vote direction is not considered private.
-
-The eligibility value is used as private circuit input and is not intentionally stored in the public governance state.
-The selected governance circuit updates the corresponding public vote counter together with totalVotes.
-Privacy note: The current MVP protects the eligibility input from intentional public-state disclosure, but the selected vote direction is not considered private.
-
-> > > > > > > Stashed changes
 
 ---
 
@@ -462,99 +362,9 @@ The Level 4 Private DAO Decision Engine frontend includes:
 - GitHub Actions CI/CD
 - Production build validation
 
-Updated upstream
 The frontend also explicitly documents that ballot-direction privacy and duplicate-vote prevention are not implemented in the current MVP.
 
 ---
-
-## The frontend also explicitly documents that ballot-direction privacy and duplicate-vote prevention are not implemented in the current MVP.
-
-## 🔨 Level 4 Compact Contract Compilation
-
-The Level 4 governance contract introduces the `voteYes` and `voteNo` circuits for the Private DAO Decision Engine.
-
-Both governance circuits were successfully compiled with the Midnight Compact compiler.
-
-### 📸 Compilation Evidence
-
-<img width="1087" height="291" alt="Midnight-Level-4-Governance-Contract-Compile-Success" src="https://github.com/user-attachments/assets/82082735-ce0d-4112-aa05-f30e16c034b5" />
-
-## 🌐 Level 4 Preprod Deployment
-
-The compiled governance contract was successfully deployed to the Midnight Preprod network.
-
-**Network:** Midnight Preprod
-
-**Contract Address:**
-
-```text
-022d78119bca01fa590c08d0a0209bdbd1e1baef1e8fae6a49670e75ca8b3695
-```
-
-### 📸 Preprod Deployment Evidence
-
-<img width="1350" height="787" alt="Midnight-Level-4-Governance-Contract-Preprod-Deployment" src="https://github.com/user-attachments/assets/7812101b-147d-4667-992a-65a7f1507151" />
-
-## 👛 Level 4 Preprod Wallet Setup
-
-A dedicated development wallet was synchronized with the Midnight Preprod network before funding and contract deployment.
-
-### 📸 Wallet Synchronization Evidence
-
-<img width="590" height="597" alt="Midnight-Level-4-Preprod-Wallet-Sync-Completed" src="https://github.com/user-attachments/assets/fb04b7f3-1d3f-49fb-81b4-eac2166e7d24" />
-
-### 📸 Preprod Faucet Funding
-
-The development wallet was funded with 5,000 tNIGHT from the Midnight Preprod faucet for contract deployment and testing.
-
-<img width="842" height="762" alt="Midnight-Level-4-Preprod-Wallet-Funded-5000-tNight" src="https://github.com/user-attachments/assets/d957b1e7-4a8f-4439-be28-6e4f7c9ff392" />
-
-### 📸 Funded Wallet Verification
-
-After funding, the development wallet balance was verified on Midnight Preprod before the governance contract deployment.
-
-<img width="1290" height="552" alt="Midnight-Level-4-Preprod-Wallet-Funded-and-Synced" src="https://github.com/user-attachments/assets/346b38cf-1a49-4102-8f05-23737c50c0b7" />
-
-## 🧪 Level 4 Automated Tests
-
-The Level 4 frontend validation suite verifies the supported private input range and the eligibility threshold behavior used by the governance flow.
-
-The automated test suite contains seven tests covering:
-
-- Minimum supported private value (`0`)
-- Maximum supported private value (`65535`)
-- Values below the supported range
-- Values above the supported range
-- A value below the eligibility threshold (`17`)
-- The exact eligibility threshold (`18`)
-- A value above the eligibility threshold
-
-Current result:
-
-```text
-Test Files  1 passed (1)
-Tests       7 passed (7)
-```
-
-### 📸 Automated Test Evidence
-
-<img width="821" height="495" alt="Midnight-Level-4-Frontend-Tests-Passed" src="https://github.com/user-attachments/assets/0ccf536d-58a6-4ba9-aa77-eba33da6b5d9" />
-
-## 🏗️ Level 4 Production Build
-
-The Level 4 frontend successfully completes the production build process.
-
-The production build validates that the React application, generated Compact bindings, Midnight providers, and governance integration can be bundled for deployment.
-
-```bash
-cd frontend
-npm run build
-```
-
-### 📸 Production Build Evidence
-
-<img width="910" height="726" alt="Midnight-Level-4-Frontend-Build-Success" src="https://github.com/user-attachments/assets/c5d63f58-6310-4a78-8bef-29f3fac7788f" />
->>>>>>> Stashed changes
 
 ## 🔨 Level 4 Compact Contract Compilation
 
@@ -694,8 +504,9 @@ midnight-project-v1/
 │   │
 │   └── vite.config.ts
 │
-├── contract/
-│   └── Compact contract source
+├── demo-1/
+│   └── contracts/
+│       └── hello-world.compact
 │
 └── README.md
 │
@@ -730,31 +541,28 @@ The application must use the **Preprod** network.
 git clone https://github.com/mustafaColak0/midnight-project-v1.git
 cd midnight-project-v1
 ```
-
-### 2. Install Dependencies
-
-Install the project dependencies according to the repository package configuration.
-
-```bash
-npm install
-```
-
-If the frontend is maintained in a separate directory:
+### 2. Install Frontend Dependencies
 
 ```bash
 cd frontend
 npm install
+cd ..
 ```
 
 ---
 
 ### 3. Build the Compact Contract
 
-Build the Compact contract and generated artifacts using the project's configured build command.
+Compile the Compact contract and generate the required contract artifacts:
 
 ```bash
-npm run build
+cd demo-1
+npm install
+npm run compile
+cd ..
 ```
+
+> The current Compact compilation workflow is intended for a Unix-like environment such as GitHub Codespaces, with the Midnight Compact compiler installed and available on `PATH`.
 
 ---
 
@@ -992,8 +800,8 @@ The application:
 - Does not request wallet seed phrases
 - Does not request wallet private keys
 - Uses wallet authorization through the Midnight DApp Connector API
-- Keeps the secret circuit input private
-- Publishes only the information required for verification
+- Uses the eligibility value as private circuit input and does not intentionally store the exact value in public governance state
+- Documents the public governance state and current privacy limitations explicitly
 - Uses the Midnight Preprod network for development and testing
 
 ---
