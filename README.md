@@ -80,7 +80,9 @@ or:
 voteNo(secretValue)
 
 The exact private eligibility value is not intentionally written to the public contract state.
-Current Governance State
+
+### Current Governance State
+
 The contract maintains the following public state:
 
 proposalActive
@@ -89,7 +91,8 @@ noVotes
 totalVotes
 
 This allows the MVP to demonstrate private eligibility verification combined with publicly verifiable governance counters.
-Long-Term Direction
+
+### Long-Term Direction
 The Private DAO Decision Engine is designed as a foundation for additional privacy-preserving governance primitives, including:
 - Nullifier-based duplicate participation protection
 - Credential-based governance eligibility
@@ -121,7 +124,9 @@ the governance circuit evaluates:
 21 >= 18
 
 without intentionally storing 21 as a public governance state value.
-What Is Public
+
+### What Is Public
+
 The current Level 4 contract intentionally maintains:
 proposalActive
 yesVotes
@@ -130,7 +135,7 @@ totalVotes
 
 These values are part of the public governance state.
 The current implementation also uses separate voteYes and voteNo circuits. Therefore, vote direction is not treated as private in the current MVP.
-Current Privacy Boundary
+### Current Privacy Boundary
 Private eligibility value
         │
         ▼
@@ -148,7 +153,8 @@ Selected governance circuit
 Public governance counters
 (yesVotes / noVotes / totalVotes)
 
-Current Limitations
+### Current Limitations
+
 The Level 4 MVP does not yet implement:
 - Private ballot direction
 - Nullifier-based duplicate-vote prevention
@@ -160,21 +166,35 @@ This demonstrates the separation between **private witness data** and **publicly
 
 ---
 
-## 🧠 Private Witness vs Public Ledger
+## 🧠 Private Witness vs Public Governance State
 
-### Private Witness
+### Private Input
 
-Private witness data remains on the client side and can be used as private input during Zero-Knowledge proof generation.
+The governance flow receives `secretValue` as the private eligibility input used by the Compact circuit.
 
-In this project, the secret threshold value is treated as private information and is not intentionally published as public ledger state.
+The exact eligibility value is not intentionally written to the public governance state.
 
-### Public Ledger
+For example:
 
-The public ledger contains the state required for publicly verifiable execution.
+```text
+secretValue = 21
+```
+The circuit can evaluate:
+secretValue >= 18
 
-The DApp exposes the result of the threshold verification rather than the original secret value.
+without intentionally storing the exact value 21 in the public governance counters.
 
-This allows the application to prove a statement about private information without disclosing that information.
+### Public Governance State
+
+The Level 4 contract maintains publicly verifiable governance state:
+proposalActive
+yesVotes
+noVotes
+totalVotes
+
+A successful governance transaction updates the corresponding public counters.
+Because the current implementation exposes separate voteYes and voteNo circuits and public vote counters, the current MVP does not claim ballot-direction privacy.
+This architecture demonstrates how private eligibility data can be separated from publicly verifiable governance state.
 
 ---
 
@@ -213,7 +233,7 @@ The application never requests or handles the user's seed phrase or private keys
 
 The DApp also supports the **1AM Midnight wallet** through the same wallet discovery architecture.
 
-1AM was used to demonstrate the successful Preprod circuit transaction during development.
+1AM is supported through the same Midnight DApp Connector architecture and is currently used during Level 4 Preprod governance testing.
 
 This demonstrates that the wallet integration layer is compatible with multiple wallets exposed through the Midnight DApp Connector API.
 
@@ -225,17 +245,17 @@ During development, Lace successfully connected to the DApp on the **Preprod** n
 
 However, the installed Lace environment encountered a wallet-side Preprod synchronization / transaction-balancing issue during transaction execution.
 
-The DApp therefore used **1AM** to demonstrate the successful circuit transaction while retaining the required Lace Preprod connect/disconnect implementation.
+The Level 4 governance flow is therefore being tested primarily with **1AM**, while the existing Lace Preprod connect/disconnect integration remains available in the DApp.
 
 This behavior is documented transparently because the application itself successfully reaches the deployed contract and constructs the transaction before handing wallet-specific operations to the connected wallet.
 
 ---
 
-## 🧩 Circuit Execution
+## 🧩 Level 4 Governance Execution Flow
 
-The frontend connects to the deployed Preprod contract and executes the private threshold circuit.
+The Level 4 frontend connects to the deployed governance contract on Midnight Preprod through the Midnight.js provider architecture.
 
-The execution flow is:
+The current governance flow is:
 
 ```text
 React Frontend
@@ -247,13 +267,24 @@ Midnight DApp Connector
 Midnight.js Providers
       │
       ▼
-Deployed Compact Contract
+Level 4 Governance Contract
       │
       ▼
-proveThreshold(secretValue)
+Private Eligibility Input
+(secretValue)
       │
       ▼
-Zero-Knowledge Proof
+Verify secretValue >= 18
+      │
+      ▼
+Select Governance Circuit
+      │
+      ├── voteYes(secretValue)
+      │
+      └── voteNo(secretValue)
+      │
+      ▼
+Zero-Knowledge Proof Generation
       │
       ▼
 Transaction Balancing
@@ -264,28 +295,19 @@ Transaction Submission
       ▼
 Midnight Preprod
 ```
-
-A successful execution produces a verified result in the UI:
-
-```text
-Private threshold proof verified on Preprod.
-
-Public result:
-thresholdProofVerified = true
-
-The secret value was not disclosed to the public ledger.
-```
-
+The eligibility value is used as private circuit input and is not intentionally stored in the public governance state.
+The selected governance circuit updates the corresponding public vote counter together with totalVotes.
+Privacy note: The current MVP protects the eligibility input from intentional public-state disclosure, but the selected vote direction is not considered private.
 ---
 
-## ✅ Successful Preprod Transaction
+## ✅ Level 4 Successful Preprod Governance Transaction
 
-A successful Zero-Knowledge circuit execution was submitted to Midnight Preprod during testing.
+The Level 4 governance transaction will be documented here after successful execution on Midnight Preprod.
 
-Example transaction identifier:
+### Transaction ID
 
 ```text
-00da1669c44d65cecc13d3559a8e2dd3e526551f17c7ffe8efc9f0b55016709db1
+Pending successful Preprod governance transaction
 ```
 
 The transaction was:
@@ -306,29 +328,30 @@ Verified on Preprod
 
 ---
 
-## 🖥️ Frontend Features
+## 🖥️ Level 4 Frontend Features
 
-The Level 3 frontend includes:
+The Level 4 Private DAO Decision Engine frontend includes:
 
 - Midnight-compatible wallet discovery
-- Lace wallet connection
-- Lace wallet disconnection
+- Lace wallet connection and disconnection
 - 1AM wallet support
-- Preprod network validation
-- Connected wallet identity
+- Midnight Preprod network validation
+- Connected wallet identity display
 - Unshielded public address display
-- Deployed contract address display
-- Private secret input
-- Compact circuit invocation
-- Zero-Knowledge proof generation
-- Transaction submission
-- Public verification result
-- Privacy status visualization
-- Private Eligibility Gate validation
-- Eligibility threshold verification
-- Automated Vitest test suite
+- Level 4 governance contract address display
+- Private eligibility input
+- YES / NO governance vote selection
+- `voteYes` Compact circuit integration
+- `voteNo` Compact circuit integration
+- Zero-Knowledge proof generation flow
+- Transaction balancing and submission flow
+- Eligibility threshold validation
+- Explicit governance privacy model
+- Automated Vitest validation suite
 - GitHub Actions CI/CD
-- Automated production build validation
+- Production build validation
+
+The frontend also explicitly documents that ballot-direction privacy and duplicate-vote prevention are not implemented in the current MVP.
 ---
 
 ## 🔨 Level 4 Compact Contract Compilation
