@@ -30,6 +30,17 @@ Follow the development of Midnight Private DAO and the Private DAO Decision Engi
 
 **X:** https://x.com/PrivateDAOEngin
 
+---
+
+## 🚀 Live Application
+
+**Midnight Private DAO — Preprod DApp:**  
+https://midnight-privacy-voting.vercel.app/
+
+> The application connects to the Midnight Preprod network. Proof generation requires access to the configured Midnight Proof Server.
+
+---
+
 ## 🎥 Level 4 Demo
 
 The Level 4 demo demonstrates the Private DAO Decision Engine executing a real governance transaction on Midnight Preprod.
