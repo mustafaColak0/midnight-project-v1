@@ -24,14 +24,22 @@ Current privacy scope: eligibility input privacy is implemented. Private ballot 
 
 ---
 
-## 🌐 Live Demo
+## 🎥 Level 4 Demo
 
-**Live Application:**  
-[Midnight Private DAO Decision Engine](https://midnight-privacy-voting.vercel.app/)
+The Level 4 demo demonstrates the Private DAO Decision Engine executing a real governance transaction on Midnight Preprod.
 
-> The application targets the Midnight **Preprod** network.
+The demonstration includes:
 
-> The hosted frontend demonstrates the Level 4 governance interface. Proof execution currently depends on the configured Midnight proof infrastructure, so remote transaction execution should not be assumed unless the required proof service is available.
+- 1AM wallet connected to Midnight Preprod
+- Private eligibility input
+- Governance vote selection
+- Zero-Knowledge proof generation
+- Transaction balancing and submission
+- Successful governance transaction confirmation on Preprod
+
+[Watch the Level 4 Private DAO Decision Engine Demo](https://drive.google.com/file/d/1GzTcksh6h_LREnTiaKcHNRo2fr4YFryw/view)
+
+> The current MVP provides privacy-preserving eligibility verification for governance participation. Vote direction is public through the selected governance circuit, and duplicate-vote prevention is not yet implemented.
 
 ---
 
@@ -313,31 +321,47 @@ Privacy note: The current MVP protects the eligibility input from intentional pu
 
 ## ✅ Level 4 Successful Preprod Governance Transaction
 
-The Level 4 governance transaction will be documented here after successful execution on Midnight Preprod.
+The Level 4 Private DAO Decision Engine successfully executed a governance vote on the Midnight Preprod network using the deployed governance contract and the 1AM wallet.
 
-### Transaction ID
-
-```text
-Pending successful Preprod governance transaction
-```
-
-The transaction was:
+The transaction completed the full governance flow:
 
 ```text
-Circuit generated
-      ↓
-Proof generated
-      ↓
+Private eligibility input
+        ↓
+Eligibility requirement verified
+        ↓
+Governance circuit executed
+        ↓
+Zero-Knowledge proof generated
+        ↓
 Transaction balanced
-      ↓
-Transaction submitted
-      ↓
-Accepted by wallet
-      ↓
-Verified on Preprod
+        ↓
+Transaction submitted through 1AM
+        ↓
+Confirmed on Midnight Preprod
 ```
 
+### DApp Transaction ID
+
+```text
+00df940bb0a831e2e103809e7ad9f367b548505cfa40d806c6811d53abb84707c2
+```
+
+**Submitted Vote:** YES  
+**Network:** Midnight Preprod  
+**Wallet:** 1AM  
+**Contract Address:** `022d78119bca01fa590c08d0a0209bdbd1e1baef1e8fae6a49670e75ca8b3695`
+
+The eligibility value was used as private circuit input and was not intentionally written to the public governance state. The current MVP does not claim ballot-direction privacy or duplicate-vote prevention.
 ---
+
+### 📸 Governance Vote Confirmation
+<img width="1916" height="897" alt="Midnight-Level-4-Governance-Vote-Preprod-Confirmed" src="https://github.com/user-attachments/assets/ebfeaaa3-7a06-4035-9908-407b93635034" />
+
+### 📸 Midnight Explorer Confirmation
+The submitted governance transaction was successfully included on Midnight Preprod and displayed as SUCCESS by the Midnight Explorer.
+<img width="1377" height="847" alt="Midnight-Level-4-Governance-Transaction-Explorer-Success" src="https://github.com/user-attachments/assets/697668e9-e485-40d0-b085-11c89f532b7a" />
+
 
 ## 🖥️ Level 4 Frontend Features
 
