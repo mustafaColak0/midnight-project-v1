@@ -24,6 +24,12 @@ Current privacy scope: eligibility input privacy is implemented. Private ballot 
 
 ---
 
+## 🌙 Product X Profile
+
+Follow the development of Midnight Private DAO and the Private DAO Decision Engine on X:
+
+**X:** https://x.com/PrivateDAOEngin
+
 ## 🎥 Level 4 Demo
 
 The Level 4 demo demonstrates the Private DAO Decision Engine executing a real governance transaction on Midnight Preprod.
